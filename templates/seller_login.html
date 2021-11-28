@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商家登录界面</title>
+</head>
+<body>
+<h1>商家登录界面</h1>
+<form method="post" action="{% url 'app1:seller_login'%}">
+    {% csrf_token %}
+
+    <label>
+        账号
+        <input type="text" name="user_name" value="{{form.data.user_name}}">{{ form.errors.user_name.0 }}
+    </label>
+    <br>
+
+    <label>
+        密码
+        <input type="password" name="user_password">{{ form.errors.user_password.0 }}
+
+    </label>
+    <br>
+    <button type="submit">登录</button>&nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="button" value="用户登录" onclick="window.location.href='/buyer_login/'"></button>&nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="button" value="注册" onclick="window.location.href='/seller_register/'"></button>&nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
+</form>
+
+
+</body>
+</html>
