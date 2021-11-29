@@ -106,29 +106,34 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanhai'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, '/static/'),)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_ROOT = os.path.join(BASE_DIR,'pic')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'pic').replace("\\","/")
+MEDIA_URL = '/pic/'
 
-CELERY_BROKER_URL = 'redis://10.1.210.69:6379/0' # Broker配置，使用Redis作为消息中间件
+CELERY_BROKER_URL = 'redis://10.1.210.69:6379/0'  # Broker配置，使用Redis作为消息中间件
 
-CELERY_RESULT_BACKEND = 'redis://10.1.210.69:6379/0' # BACKEND配置，这里使用redis
+CELERY_RESULT_BACKEND = 'redis://10.1.210.69:6379/0'  # BACKEND配置，这里使用redis
 
-CELERY_RESULT_SERIALIZER = 'json' # 结果序列化方案
+CELERY_RESULT_SERIALIZER = 'json'  # 结果序列化方案
 
+CKEDITOR_UPLOAD_PATH = 'itemupload/'
+
+CKEDITOR_IMAGE_BACKEND='pillow'

@@ -1,5 +1,5 @@
-from django.shortcuts import render,redirect
-from app1.forms import Customer_loginForm,Seller_loginForm
+from django.shortcuts import render,redirect,HttpResponse
+from app1.forms import Customer_loginForm,Seller_loginForm,Customer_registerForm
 from app1.models import Customer,Seller
 
 # Create your views here.
@@ -11,6 +11,20 @@ def index(request):
 def buyer_register(request):
     if request.method == "GET":
         return render(request, "buyer_register.html")
+    else:
+        form = Customer_registerForm(request.POST)
+        print(request.POST)
+        if form.is_valid():
+            name = request.POST.get("name")
+            password = request.POST.get("password")
+            email = request.POST.get("email")
+            sex = request.POST.get("sex")
+            Customer.objects.create(name=name,password=password,email=email,sex=sex)
+            return HttpResponse("<script>alert('注册成功！');window.location.href='/index/';</script>")
+        else:
+            print(form.errors)
+            data = {"form": form}
+            return render(request, "buyer_register.html", data)
 
 
 def seller_register(request):

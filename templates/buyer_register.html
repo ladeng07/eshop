@@ -40,25 +40,25 @@
 
     <label>
         &nbsp;用户名&nbsp;:&nbsp;&nbsp;&nbsp;
-        <input type="text" name="user_name" value="{{form.data.user_name}}">{{ form.errors.user_name.0 }}
+        <input type="text" name="name" value="{{form.data.name}}">{{ form.errors.name.0 }}
     </label>
     <br>
 
     <label>
          &nbsp;密&nbsp;码&nbsp;:&nbsp;&nbsp;&nbsp;
-        <input type="password" name="user_password" value="{{form.data.user_password}}">{{ form.errors.user_password.0 }}
+        <input type="password" name="password" value="{{form.data.password}}">{{ form.errors.password.0 }}
     </label>
     <br>
     <label>
         确认密码
-        <input type="password" name="user_password2" value="{{form.data.user_password2}}">{{ form.errors.user_password2.0 }}
+        <input type="password" name="password2" value="{{form.data.password2}}">{{ form.errors.password2.0 }}
     </label>
     <br>
     <label>
         Email:&nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="email" name="user_email" value="{{ form.data.user_email }}">
+        <input type="email" name="email" value="{{ form.data.email }}">
     </label>
-    <input type="button" onclick="check_email(user_email)" value="获取验证码"></input>{{ form.errors.user_email.0 }}
+    <input type="button" onclick="check_email(email)" value="获取验证码"></input>{{ form.errors.email.0 }}
     <br>
     <label>
         验证码:&nbsp;&nbsp;
@@ -69,12 +69,14 @@
     <label>
         性 别：
     <label for="gender">男</label>
-    <input id="male" type="radio" name="user_sex" value="男">
+    <input id="male" type="radio" name="sex" value=0>
     <label for="female">女</label>
-    <input id="female" type="radio" name="user_sex" value="女">
+    <input id="female" type="radio" name="sex" value=1>
     <label for="other">其他</label>
-    <input id="other" type="radio" name="user_sex" value="其他">
+    <input id="other" type="radio" name="sex" value=2>
     </label>
+    <br>
+    {{ form.non_field_errors.0 }}
     <br>
     <button type="submit">立即注册</button>&nbsp;&nbsp;
     <input type="button" value="返回登录" onclick="window.location.href='/buyer_login/'"></button>&nbsp;&nbsp;
