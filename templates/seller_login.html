@@ -6,11 +6,11 @@
 </head>
 <body>
 <h1>商家登录界面</h1>
-<form method="post" action="{% url 'app1:buyer_login'%}">
+<form method="post" action="{% url 'app1:seller_login'%}">
     {% csrf_token %}
 
     <label>
-        用户名
+        账号
         <input type="text" name="name" value="{{form.data.name}}">{{ form.errors.name.0 }}
     </label>
     <br>

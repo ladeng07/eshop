@@ -26,13 +26,18 @@ def buyer_login(request):
         if form.is_valid():
             name = request.POST.get("name")
             password = request.POST.get("password")
-            user = Customer.objects.filter(name=name, password=password)
+            user = Customer.objects.filter(name=name)
             if user:
-                request.session['is_login'] = True
-                request.session["id"] = user[0].id
-                return redirect("/index/")
+                user = Customer.objects.filter(name=name, password=password)
+                if user:
+                    request.session['is_login'] = True
+                    request.session["id"] = user[0].id
+                    return redirect("/index/")
+                else:
+                    data = {"errmsg": "密码错误嗷！", "form": form}
+                    return render(request, "buyer_login.html", data)
             else:
-                data = {"errmsg": "密码错误嗷！", "form": form}
+                data = {"errmsg": "该用户名尚未注册", "form": form}
                 return render(request, "buyer_login.html", data)
         else:
             print(form.errors.as_json)
@@ -48,13 +53,18 @@ def seller_login(request):
         if form.is_valid():
             name = request.POST.get("name")
             password = request.POST.get("password")
-            user = Seller.objects.filter(name=name, password=password)
+            user = Seller.objects.filter(name=name)
             if user:
-                request.session['is_login'] = True
-                request.session["id"] = user[0].id
-                return redirect("/index/")
+                user = Seller.objects.filter(name=name,password=password)
+                if user:
+                    request.session['is_login'] = True
+                    request.session["id"] = user[0].id
+                    return redirect("/index/")
+                else:
+                    data = {"errmsg": "密码错误嗷！", "form": form}
+                    return render(request, "seller_login.html", data)
             else:
-                data = {"errmsg": "密码错误嗷！", "form": form}
+                data = {"errmsg": "该用户名尚未注册", "form": form}
                 return render(request, "seller_login.html", data)
         else:
             print(form.errors.as_json)
