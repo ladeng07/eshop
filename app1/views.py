@@ -1,49 +1,62 @@
-from django.shortcuts import render
-
+from django.shortcuts import render,redirect
+from app1.forms import Customer_loginForm,Seller_loginForm
+from app1.models import Customer,Seller
 
 # Create your views here.
 
-def index(requests):
-    return render(requests, "index.html")
+def index(request):
+    return render(request, "index.html")
 
 
-def buyer_register(requests):
-    if requests.method == "GET":
-        return render(requests, "buyer_register.html")
+def buyer_register(request):
+    if request.method == "GET":
+        return render(request, "buyer_register.html")
 
 
-def seller_register(requests):
-    if requests.method == "GET":
-        return render(requests, "seller_register.html")
+def seller_register(request):
+    if request.method == "GET":
+        return render(request, "seller_register.html")
 
 
-def buyer_login(requests):
-    if requests.method == "GET":
-        return render(requests, "buyer_login.html")
+def buyer_login(request):
+    if request.method == "GET":
+        return render(request, "buyer_login.html")
     else:
-        form = LoginForm(request.POST)
+        form = Customer_loginForm(request.POST)
         if form.is_valid():
-            user_name = request.POST.get("user_name")
-            user_password = request.POST.get("user_password")
-            try:
-                User.objects.get(user_name=user_name)
-            except User.DoesNotExist:
-                data = {"errmsg": "该用户名未注册，请注册！"}
-                return render(request, "login.html", data)
-
-            user = User.objects.filter(user_name=user_name, user_password=user_password)
+            name = request.POST.get("name")
+            password = request.POST.get("password")
+            user = Customer.objects.filter(name=name, password=password)
             if user:
                 request.session['is_login'] = True
                 request.session["id"] = user[0].id
                 return redirect("/index/")
             else:
                 data = {"errmsg": "密码错误嗷！", "form": form}
-                return render(request, "login.html", data)
+                return render(request, "buyer_login.html", data)
         else:
+            print(form.errors.as_json)
             data = {"form": form}
-            return render(request, "login.html", data)
+            return render(request, "buyer_login.html", data)
 
 
-def seller_login(requests):
-    if requests.method == "GET":
-        return render(requests, "seller_login.html")
+def seller_login(request):
+    if request.method == "GET":
+        return render(request, "seller_login.html")
+    else:
+        form = Seller_loginForm(request.POST)
+        if form.is_valid():
+            name = request.POST.get("name")
+            password = request.POST.get("password")
+            user = Seller.objects.filter(name=name, password=password)
+            if user:
+                request.session['is_login'] = True
+                request.session["id"] = user[0].id
+                return redirect("/index/")
+            else:
+                data = {"errmsg": "密码错误嗷！", "form": form}
+                return render(request, "seller_login.html", data)
+        else:
+            print(form.errors.as_json)
+            data = {"form": form}
+            return render(request, "seller_login.html", data)
