@@ -1,5 +1,5 @@
 from django.db import models
-import os
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 # Create your models here.
@@ -10,10 +10,9 @@ class Customer(models.Model):
     name = models.CharField(max_length=10, verbose_name="用户名")
     password = models.CharField(max_length=28, verbose_name="密码")
     email = models.EmailField(max_length=50, verbose_name="邮箱", unique=True)
-    money = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="余额",default=0)
-    check_number = models.CharField(max_length=4, default=0, verbose_name="验证码")
-    sex = models.IntegerField(choices=SEX_LIST, verbose_name="性别",null=True,blank=True)
-    img = models.ImageField(upload_to="user_avatar/", verbose_name="头像", default="user_avatar/default.jpg")
+    money = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="余额", default=0)
+    sex = models.IntegerField(choices=SEX_LIST, verbose_name="性别", null=True, blank=True)
+    avatar = models.ImageField(upload_to="user_avatar/", verbose_name="头像", default="user_avatar/default.jpg")
     register_time = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
     goods = models.ManyToManyField(to="Goods", through="Order")
 
@@ -43,16 +42,17 @@ class Order(models.Model):
 
 
 class Goods(models.Model):
+    categories = ((0, "无分类"), (1, "生活用品"), (2, "体育用品"), (3, "学习用品"), (4, "小吃零食"), (5, "服装"), (6, "电子产品"))
     item_img = models.ImageField(upload_to="item_img/", null=True, blank=True, verbose_name="商品图片",
                                  default="item_img/default.jpg")
     item_name = models.CharField(max_length=100, default="NULL", null=True, blank=True, verbose_name="商品名")
-    item_introduction = models.TextField(max_length=1000, default="这是一个商品的介绍需要十五个字", null=True,
-                                         blank=True, verbose_name="商品介绍")
+    item_introduction = RichTextUploadingField(default="这是一个商品的介绍需要十五个字", verbose_name="商品介绍")
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="发布时间")
-    seller_id = models.IntegerField(verbose_name="卖家ID")
+    seller = models.ForeignKey("Seller", on_delete=models.CASCADE, verbose_name="卖家ID")
     number = models.IntegerField(default=0, null=True, blank=True, verbose_name="库存")
     item_price = models.DecimalField(max_digits=20, decimal_places=2, default=0.0, null=True, blank=True,
                                      verbose_name="价格")
+    category_id = models.IntegerField(choices=categories, default=0, verbose_name="商品分类")
 
 
 class Comment(models.Model):
@@ -68,10 +68,10 @@ class Seller(models.Model):
     password = models.CharField(max_length=28, verbose_name="密码")
     email = models.EmailField(max_length=50, verbose_name="邮箱", unique=True)
     register_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name="注册时间")
-    img = models.ImageField(upload_to="seller_avatar/", verbose_name="头像", default="seller_avatar/default.jpg")
-    sex = models.CharField(max_length=10, verbose_name="性别")
-    check_number = models.CharField(max_length=4, default="0", verbose_name="验证码")
-    item = models.ForeignKey(to="Goods", on_delete=models.CASCADE, null=True)
+    avatar = models.ImageField(upload_to="seller_avatar/", verbose_name="头像", default="seller_avatar/default.jpg")
+    sex = models.CharField(max_length=10, verbose_name="性别", default=0)
+    # check_number = models.CharField(max_length=4, default="0", verbose_name="验证码")
+    # item = models.ForeignKey(to="Goods", on_delete=models.CASCADE, null=True)
 
 
 class ReComment(models.Model):

@@ -3,15 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>米奇妙妙屋</title>
+    <style>
+        .divcss5 {
+            border: 1px solid #000;
+            width:120px;
+            _height: 50px;
+            min-height: 50px;
+        }
+        textarea{
+            resize: none;
+        }
+        a{ text-decoration:none}
+        a{color: #000000
+        }
+        a:hover{color: #3174d0
+        }
+    </style>
 </head>
 <body>
 <h1>这是一个电商平台首页</h1>
+{% if not is_login %}
 <form action="">
 <input type="button" name='id' id='id' value="用户入口" onclick="window.location.href='/buyer_login/'"></button>
 <input type="button" name='id' id='id' value="商家入口" onclick="window.location.href='/seller_login/'"></button>
     <input type="file" name="avatar" value=“上传” alt="请选择正确的图片" accept="image/jpeg, image/jpg ,image/png"/>
 </form>
 <img src="{{ MEDIA_URL }}user_avatar/default.jpg" height="200" width="200">
+    {% elif is_login == 1 %}
+    <div>
+    <h3>您好，尊敬的VIP顾客{{ name }}</h3>
+    <input type="button" value="个人信息" onclick="window.location.href='/customer_info/'"></button>
+    <input type="button" value="登出" onclick="window.location.href='/logout/'"></button>
+    </div>
+    {% elif is_login == 2 %}
+    <div>
+    <h3>你好，商家@{{ name }}</h3>
+    <input type="button" value="发布商品" onclick="window.location.href='/create_good/'"></button>
+    <input type="button" value="个人信息" onclick="window.location.href='/seller_info/'"></button>
+    <input type="button" value="登出" onclick="window.location.href='/logout/'"></button>
+    </div>
+{% endif %}
+
+{% for item in goods %}
+     <div class="divcss5">
+        <div style="color:#000000" >
+            <h3>@{{ item.seller.name}}</h3>
+        </div>
+        <img src="{{ MEDIA_URL }}item_img/default.jpg" height="100" width="100">
+         <p>{{ item.item_name }}</p>
+         <h3>价格：{{ item.item_price }}元</h3>
+     <a href="/good_info/{{ item.id }}/" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;查看详情</a>
+    </div>
+{% endfor %}
 
 </body>
 </html>

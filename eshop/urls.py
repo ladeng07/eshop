@@ -22,6 +22,7 @@ from eshop import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include (('app1.urls', 'app1'), namespace="app1")),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
     re_path(r'media/(?P<path>.*)$',serve,{'document_root':settings.MEDIA_ROOT}),
 ]
 

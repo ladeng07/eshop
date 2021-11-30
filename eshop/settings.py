@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app1',
+    'ckeditor',
+    'ckeditor_uploader',
+
 ]
 
 MIDDLEWARE = [
@@ -105,9 +108,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hans'
 
-TIME_ZONE = 'Asia/Shanhai'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -135,6 +138,23 @@ CELERY_RESULT_BACKEND = 'redis://10.1.210.69:6379/0'  # BACKEND配置，这里�
 
 CELERY_RESULT_SERIALIZER = 'json'  # 结果序列化方案
 
-CKEDITOR_UPLOAD_PATH = 'itemupload/'
+CKEDITOR_UPLOAD_PATH = 'item_img/'
 
-CKEDITOR_IMAGE_BACKEND='pillow'
+CKEDITOR_IMAGE_BACKEND = 'pillow'
+
+CKEDITOR_ALLOW_NONIMAGE_FILES = False
+
+CACHES = {
+
+    'verify_code': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/2',  # redis所在服务器或容器ip地址
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    },
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    },
+}

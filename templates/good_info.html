@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品详情页</title>
+    {% load static %}
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+</head>
+<body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
+<h3>{{ good.item_name}}</h3>
+<img src="{{ MEDIA_URL }}{{ good.item_img }}" height="200" width="200">
+<p>惊爆价：{{ good.item_price }}元！！,库存：{{ good.number }}</p>
+<p>{{ good.item_introduction }}</p>
+<p>发布时间：{{ good.create_time }}</p>
+<br>
+<input type="button" value="加入购物车" onclick="window.location.href='/index/'"></button>
+<input type="button" value="立即购买" onclick="window.location.href='/index/'"></button>
+<div>
+    <p>商家：@{{ good.seller.name }}</p>
+    <img src="{{ MEDIA_URL }}{{ good.item_img }}" height="80" width="80">
+</div>
+<input type="button" value="评论商品" onclick="window.location.href='/index/'"></button>
+
+</body>
+</html>

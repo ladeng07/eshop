@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import path
 from app1 import views
+from eshop import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -13,5 +15,9 @@ urlpatterns = [
         path("seller_login/",views.seller_login,name="seller_login"),
         path("customer_info/",views.customer_info,name="customer_info"),
         path("seller_info/",views.seller_info,name="seller_info"),
+        path("good_info/<int:id>/",views.good_info,name="good_info"),
+        path("logout/",views.logout,name="logout"),
+        path("create_good/",views.create_good,name="create_good"),
 
-]
+
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -8,18 +8,21 @@
 <h1>顾客登录界面</h1>
 <form method="post" action="{% url 'app1:buyer_login'%}">
     {% csrf_token %}
-
+    <input  type="hidden" name="k" id="k" value="{{ k }}">
     <label>
-        账号
+        账号：
         <input type="text" name="name" value="{{form.data.name}}">{{ form.errors.name.0 }}
     </label>
     <br>
 
     <label>
-        密码
+        密码：
         <input type="password" name="password">{{ form.errors.password.0 }}
 
     </label>
+    <br>
+    验证码：
+    <input type="text" name="verify_code">
     <br>
     {% if errmsg %}
     {{ errmsg }}
@@ -27,12 +30,14 @@
     {{ form.non_field_errors.0 }}
     {% endif %}
     <br>
+    <img src="data:image/jpg;base64,{{ image }}" height="100" width="200">
+    <br>
     <button type="submit">登录</button>&nbsp;&nbsp;&nbsp;&nbsp;
     <input type="button" value="商家登录" onclick="window.location.href='/seller_login/'"></button>&nbsp;&nbsp;&nbsp;&nbsp;
     <input type="button" value="注册" onclick="window.location.href='/buyer_register/'"></button>&nbsp;&nbsp;&nbsp;&nbsp;
     <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
-
 </form>
+
 
 </body>
 </html>

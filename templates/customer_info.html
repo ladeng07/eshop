@@ -7,12 +7,13 @@
 <body>
 <h1>用户个人信息</h1>
 <div>
-    用户名:<p>{{ form.name}}</p>
-    邮箱:<p>{{ form.email }}</p>
-    性别:<p>{{ form.sex }}</p>
-    注册时间:<p>{{ form.register_time }}</p>
-    钱包余额:<p>{{ form.money }}</p>
-    收获地址:<p></p>
+    <img src="{{ MEDIA_URL }}{{ form.avatar }}" height="200" width="200"><br>
+    用户名:{{ form.name}}<br>
+    邮箱:{{ form.email }}<br>
+    性别:{{ form.sex }}<br>
+    注册时间:{{ form.register_time }}<br>
+    钱包余额:{{ form.money }}<br>
+    收获地址:
 </div>
 </body>
 </html>

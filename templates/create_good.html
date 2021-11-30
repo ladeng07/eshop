@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>发布商品</title>
+    {% load static %}
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+</head>
+<body>
+<form method="POST" action="{% url 'app1:create_good' %}">
+    {% csrf_token %}
+    <h3>发布商品</h3>
+    商品名称：
+    <input type="text" name="item_name" value=>
+    库存：
+    <input type="text" name="number">
+    价格：
+    <input type="text" name="item_price">
+    商品分类：
+    <select>
+        <option>选择分类</option>
+        <option value=1>生活用品</option>
+        <option value=2>体育用品</option>
+        <option value=3>学习用品</option>
+        <option value=4>小吃零食</option>
+        <option value=5>服装</option>
+        <option value=6>电子产品</option>
+        <option value=0>其他</option>
+    </select>
+    上传图片：
+    <input type="file" name="item_img" value=“上传” alt="请选择正确的图片" accept="image/jpeg, image/jpg ,image/png"/>
+    <br>
+    商品详情：
+    <textarea name=item_introduction></textarea>
+    <script type="text/javascript">CKEDITOR.replace('item_introduction');</script>
+    <button type="submit">发布商品</button>
+    <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
+</form>
+
+</body>
+</html>

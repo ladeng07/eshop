@@ -69,17 +69,22 @@
     <label>
         性 别：
     <label for="gender">男</label>
-    <input id="male" type="radio" name="user_sex" value="男">
+    <input id="male" type="radio" name="sex" value="男">
     <label for="female">女</label>
-    <input id="female" type="radio" name="user_sex" value="女">
+    <input id="female" type="radio" name="sex" value="女">
     <label for="other">其他</label>
-    <input id="other" type="radio" name="user_sex" value="其他">
+    <input id="other" type="radio" name="sex" value="其他">
     </label>
     <br>
     <button type="submit">立即注册</button>&nbsp;&nbsp;
     <input type="button" value="返回登录" onclick="window.location.href='/seller_login/'"></button>&nbsp;&nbsp;
     <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 </form>
+{% if errmsg %}
+    {{ errmsg }}
+    {% else %}
+    {{ form.non_field_errors.0 }}
+    {% endif %}
 <br>
 
 </body>
