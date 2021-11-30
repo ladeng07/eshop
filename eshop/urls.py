@@ -21,7 +21,8 @@ from eshop import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include (('app1.urls', 'app1'), namespace="app1"))
+    path('', include (('app1.urls', 'app1'), namespace="app1")),
+    re_path(r'media/(?P<path>.*)$',serve,{'document_root':settings.MEDIA_ROOT}),
 ]
 
-re_path(r'pic/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
+

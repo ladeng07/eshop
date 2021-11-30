@@ -11,4 +11,7 @@ urlpatterns = [
         path('seller_register/',views.seller_register,name="seller_register"),
         path("buyer_login/",views.buyer_login,name="buyer_login"),
         path("seller_login/",views.seller_login,name="seller_login"),
+        path("customer_info/",views.customer_info,name="customer_info"),
+        path("seller_info/",views.seller_info,name="seller_info"),
+
 ]

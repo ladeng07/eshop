@@ -13,7 +13,7 @@ class Customer(models.Model):
     money = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="余额",default=0)
     check_number = models.CharField(max_length=4, default=0, verbose_name="验证码")
     sex = models.IntegerField(choices=SEX_LIST, verbose_name="性别",null=True,blank=True)
-    img = models.ImageField(upload_to="user_avatar/", verbose_name="头像", default="default.jpg")
+    img = models.ImageField(upload_to="user_avatar/", verbose_name="头像", default="user_avatar/default.jpg")
     register_time = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
     goods = models.ManyToManyField(to="Goods", through="Order")
 
@@ -44,7 +44,7 @@ class Order(models.Model):
 
 class Goods(models.Model):
     item_img = models.ImageField(upload_to="item_img/", null=True, blank=True, verbose_name="商品图片",
-                                 default="default.jpg")
+                                 default="item_img/default.jpg")
     item_name = models.CharField(max_length=100, default="NULL", null=True, blank=True, verbose_name="商品名")
     item_introduction = models.TextField(max_length=1000, default="这是一个商品的介绍需要十五个字", null=True,
                                          blank=True, verbose_name="商品介绍")
@@ -68,7 +68,7 @@ class Seller(models.Model):
     password = models.CharField(max_length=28, verbose_name="密码")
     email = models.EmailField(max_length=50, verbose_name="邮箱", unique=True)
     register_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name="注册时间")
-    img = models.ImageField(upload_to="seller_avatar/", verbose_name="头像", default="default.jpg")
+    img = models.ImageField(upload_to="seller_avatar/", verbose_name="头像", default="seller_avatar/default.jpg")
     sex = models.CharField(max_length=10, verbose_name="性别")
     check_number = models.CharField(max_length=4, default="0", verbose_name="验证码")
     item = models.ForeignKey(to="Goods", on_delete=models.CASCADE, null=True)

@@ -84,3 +84,16 @@ def seller_login(request):
             print(form.errors.as_json)
             data = {"form": form}
             return render(request, "seller_login.html", data)
+
+def customer_info(request):
+    if request.method == "GET":
+        return render(request,"customer_info.html")
+    else:
+        return render(request,"customer_info.html")
+
+
+def seller_info(request):
+    if request.method == "GET":
+        return render(request, "seller_info.html")
+    else:
+        return render(request, "seller_info.html")

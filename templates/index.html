@@ -9,8 +9,9 @@
 <form action="">
 <input type="button" name='id' id='id' value="用户入口" onclick="window.location.href='/buyer_login/'"></button>
 <input type="button" name='id' id='id' value="商家入口" onclick="window.location.href='/seller_login/'"></button>
+    <input type="file" name="avatar" value=“上传” alt="请选择正确的图片" accept="image/jpeg, image/jpg ,image/png"/>
 </form>
-<img src="{{ MEDIA_URL }}/default.jpg">
+<img src="{{ MEDIA_URL }}user_avatar/default.jpg" height="200" width="200">
 
 </body>
 </html>
