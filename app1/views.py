@@ -200,9 +200,9 @@ def create_good(request):
          if not item_introdcution:
              return HttpResponse("<script>alert('请输入商品介绍！');window.history.back(-1)</script>")
          if not category_id:
-             return HttpResponse("<script>alert('请输入商品介绍！');window.history.back(-1)</script>")
+             return HttpResponse("<script>alert('请选择分类标签！');window.history.back(-1)</script>")
          if not number:
-             return HttpResponse("<script>alert('请输入商品介绍！');window.history.back(-1)</script>")
+             return HttpResponse("<script>alert('请输入库存！');window.history.back(-1)</script>")
 
          Goods.objects.create(item_name=item_name,item_introdcution=item_introdcution,seller_id=request.session.get("id"),item_price=item_price)
          return render(request, "create_good.html")
