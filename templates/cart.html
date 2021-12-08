@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的购物车</title>
+    <style>
+        .divcss5 {
+            border: 1px solid #000;
+            width:300px;
+            _height: 50px;
+            min-height: 50px;
+        }
+        textarea{
+            resize: none;
+        }
+        a{ text-decoration:none}
+        a{color: #000000
+        }
+        a:hover{color: #3174d0
+        }
+    </style>
+</head>
+<body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
+<h3>购物车</h3>
+<form method="POST" action="{% url 'app1:order' %}">
+{% csrf_token %}
+<button type="submit">立即下单</button>
+<input type="hidden" name="status" value=1>
+<div>
+    {% for i in order %}
+        <div class="divcss5">
+            商品名：{{ i.item.item_name }}<br>
+            数量：{{ i.number }}<br>
+            添加时间:{{ i.create_time }}<br>
+            金额：{{ i.sum_price }}<br>
+            商品状态：{{ i.get_status_display }}
+            <br>
+        <input type="button" value="商品详情" onclick="window.location.href='/good_info/{{ i.item_id }}/'"></button>
+        <input type="button" value="修改信息" onclick="window.location.href='/index/'"></button><br>
+        选择商品：<input type="checkbox" name="item_id_set" value={{ i.id }}>
+        </div>
+    {% endfor %}
+</div>
+</form>
+
+</body>
+</html>

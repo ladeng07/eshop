@@ -18,6 +18,14 @@ urlpatterns = [
         path("good_info/<int:id>/",views.good_info,name="good_info"),
         path("logout/",views.logout,name="logout"),
         path("create_good/",views.create_good,name="create_good"),
+        path('cart/',views.cart,name="cart"),
+        path('address/',views.address,name="address"),
+        path('order/',views.order,name="order"),
+        path('order_info/',views.order_info,name="order_info"),
+        path('edit_password/',views.edit_password,name="edit_password"),
+        path('deal_order/',views.deal_order,name="deal_order"),
+        path('reject_order/',views.reject_order,name="reject_order"),
+        path('comment/',views.comment,name="comment"),
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

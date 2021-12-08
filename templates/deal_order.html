@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>处理订单</title>
+    <style>
+        .divcss5 {
+            border: 1px solid #000;
+            width:400px;
+            _height: 50px;
+            min-height: 50px;
+        }
+        textarea{
+            resize: none;
+        }
+        a{ text-decoration:none}
+        a{color: #000000
+        }
+        a:hover{color: #3174d0
+        }
+    </style>
+</head>
+<body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
+<h3>处理订单</h3>
+
+<div>
+    <h4>未处理订单</h4>
+    {% for i in order_list1 %}
+        <form method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="id" value={{ i.id }}>
+        <div class="divcss5">
+            买家名：{{ i.buyer.name }}<br>
+            商品名：{{ i.item.item_name }}  商品ID：{{ i.item.id }}<br>
+            购买数量：{{ i.number }}<br>
+            购买时间:{{ i.create_time }}<br>
+            金额：{{ i.sum_price }}<br>
+            收货地址：{{ i.address }}<br>
+            订单状态：{{ i.get_status_display }}
+            <input type="button" value="接受订单" type="submit" onclick="form.action='{% url "app1:deal_order" %}';form.submit();"/>
+            <input type="button" value="拒绝订单" type="submit" onclick="form.action='{% url "app1:reject_order" %}';form.submit();"/>
+        </div>
+        </form>
+    {% endfor %}
+</div>
+
+<div>
+    <h4>运输中</h4>
+    {% for i in order_list2 %}
+        <div class="divcss5">
+            买家名：{{ i.buyer.name }}<br>
+            商品名：{{ i.item.item_name }}  商品ID：{{ i.item.id }}<br>
+            购买数量：{{ i.number }}<br>
+            购买时间:{{ i.create_time }}<br>
+            金额：{{ i.sum_price }}<br>
+            收货地址：{{ i.address }}<br>
+            订单状态：{{ i.get_status_display }}
+        <input type="button" value="商品详情" onclick="window.location.href='/good_info/{{ i.item.id }}/'"></button>
+        </div>
+    {% endfor %}
+</div>
+
+<div>
+    <h4>历史订单</h4>
+    {% for i in order_list3 %}
+        <div class="divcss5">
+            买家名：{{ i.buyer.name }}<br>
+            商品名：{{ i.item.item_name }}  商品ID：{{ i.item.id }}<br>
+            购买数量：{{ i.number }}<br>
+            购买时间:{{ i.create_time }}<br>
+            金额：{{ i.sum_price }}<br>
+            收货地址：{{ i.address }}<br>
+            订单状态：{{ i.get_status_display }}
+            <input type="button" value="商品详情" onclick="window.location.href='/good_info/{{ i.item.id }}/'"></button>
+        </div>
+    {% endfor %}
+</div>
+
+</body>
+</html>

@@ -6,22 +6,83 @@
     {% load static %}
     <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
     <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <style>
+        .divcss5 {
+            border: 1px solid #000;
+            width:300px;
+            _height: 50px;
+            min-height: 50px;
+        }
+        textarea{
+            resize: none;
+        }
+        a{ text-decoration:none}
+        a{color: #000000
+        }
+        a:hover{color: #3174d0
+        }
+    </style>
 </head>
 <body>
+<form method="POST" action="" name="form">
+    {% csrf_token %}
+    <input type="hidden" name="item_id" value={{ good.id }}>
 <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 <h3>{{ good.item_name}}</h3>
 <img src="{{ MEDIA_URL }}{{ good.item_img }}" height="200" width="200">
 <p>惊爆价：{{ good.item_price }}元！！,库存：{{ good.number }}</p>
-<p>{{ good.item_introduction }}</p>
+
+<div id="desc_pre" hidden="hidden">
+        商品介绍：{{ good.item_introduction }}
+</div>
+<div id="desc" name="desc"></div>
+
+<script>
+        $(function() {
+                $("#desc").html($("#desc_pre").text());
+        });
+</script>
+
 <p>发布时间：{{ good.create_time }}</p>
 <br>
-<input type="button" value="加入购物车" onclick="window.location.href='/index/'"></button>
-<input type="button" value="立即购买" onclick="window.location.href='/index/'"></button>
+购买数量（整数）：
+<input type="text" name="number" value=0>
+<input type="button" value="加入购物车" type="submit" onclick="form.action='{% url "app1:cart" %}';form.submit();"/>
+<input type="button" value="立即购买" type="submit" onclick="form.action='{% url "app1:order" %}';form.submit();"/>
+    </form>
 <div>
     <p>商家：@{{ good.seller.name }}</p>
-    <img src="{{ MEDIA_URL }}{{ good.item_img }}" height="80" width="80">
+    <img src="{{ MEDIA_URL }}/{{ good.seller.avatar }}" height="80" width="80">
 </div>
-<input type="button" value="评论商品" onclick="window.location.href='/index/'"></button>
 
+<div>
+    <h3>发布评论</h3>
+<form method="post" name="comment" action="{% url 'app1:comment'%}">
+    <input type="hidden" name="item_id" value={{ good.id }}>
+    {% csrf_token %}
+    <textarea  rows="8" cols="67" name="content"></textarea>
+    <br>
+    <button type="submit">发布回复</button>&nbsp;
+</form>
+</div>
+{% for i in comment %}
+<div class="divcss5">
+        {% if customer.id == i.commenter_id %}
+        <div style="color:#d41212" >
+        <h3>#{{ i.id }}&nbsp;&nbsp;{{ customer.name }}</h3>
+        </div>
+        {% else %}
+        <h3>#{{ i.id }}</h3>
+        {% endif %}
+        <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ i.content}}</a>
+        <p>{{ i.comment_time }}</p>
+        {% if customer.id == i.commenter_id %}
+            <input >
+        {% else %}
+        {% endif %}
+    </div>
+    <br>
+{% endfor %}
 </body>
 </html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>确认订单</title>
+</head>
+<body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
+<h3>订单详情</h3>
+{% if item_set %}
+
+<form method="POST" action="{% url 'app1:order' %}">
+    {% csrf_token %}
+    {% for i in item_set %}
+    <input type="hidden" name="status" value=0>
+    <input type="hidden" name="item_id" value={{ i.item_id }}>
+    <input type="hidden" name="number" value={{ i.number }}>
+    <input type="hidden" name="price" value={{ i.sum_price }}>
+    <img src="{{ MEDIA_URL }}{{ i.item.item_img }}" height="200" width="200"><br>
+商品名：{{ i.item.item_name }}<br>
+单价：{{ i.item.item_price }}元<br>
+购买数量：{{ i.number }}<br>
+总价：{{ i.sum_price| truncatechars:5 }} 元<br>
+收获地址:<select name="address">
+    {% for j in customer.address_set.all %}
+        <option value={{ j.id }}>地址{{ forloop.counter }}:{{ j.content }}</option>
+    {% endfor %}
+    </select>
+    <br>
+{% endfor %}
+<button type="submit">立即购买</button>
+    <input type="button" value="取消购买" onclick="window.location.href='/good_info/{{ i.item.id }}/'"><br>
+</form>
+{% else %}
+
+<form method="POST" action="{% url 'app1:order' %}">
+    {% csrf_token %}
+    <input type="hidden" name="status" value=0>
+    <input type="hidden" name="item_id" value={{ item.id }}>
+    <input type="hidden" name="number" value={{ number }}>
+    <input type="hidden" name="price" value={{ price }}>
+<img src="{{ MEDIA_URL }}{{ item.item_img }}" height="200" width="200"><br>
+商品名：{{ item.item_name }}<br>
+单价：{{ item.item_price }}元<br>
+购买数量：{{ number }}<br>
+总价：{{ price| truncatechars:5 }} 元<br>
+收获地址:<select name="address">
+    {% for i in customer.address_set.all %}
+        <option value={{ i.id }}>地址{{ forloop.counter }}:{{ i.content }}</option>
+    {% endfor %}
+    </select>
+    <br>
+    <button type="submit">立即购买</button>
+    <input type="button" value="取消购买" onclick="window.location.href='/good_info/{{ item.id }}/'">
+</form>
+
+{% endif %}
+</body>
+</html>

@@ -8,7 +8,7 @@
     <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 </head>
 <body>
-<form method="POST" action="{% url 'app1:create_good' %}">
+<form method="POST" action="{% url 'app1:create_good' %}" enctype="multipart/form-data">
     {% csrf_token %}
     <h3>发布商品</h3>
     商品名称：
@@ -18,7 +18,7 @@
     价格：
     <input type="text" name="item_price">
     商品分类：
-    <select>
+    <select name="category_id">
         <option>选择分类</option>
         <option value=1>生活用品</option>
         <option value=2>体育用品</option>
@@ -29,7 +29,7 @@
         <option value=0>其他</option>
     </select>
     上传图片：
-    <input type="file" name="item_img" value=“上传” alt="请选择正确的图片" accept="image/jpeg, image/jpg ,image/png"/>
+    <input type="file" name="item_img" value=“上传” id="item_img" accept="image/jpeg, image/jpg ,image/png"/>
     <br>
     商品详情：
     <textarea name=item_introduction></textarea>

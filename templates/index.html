@@ -6,7 +6,7 @@
     <style>
         .divcss5 {
             border: 1px solid #000;
-            width:120px;
+            width:200px;
             _height: 50px;
             min-height: 50px;
         }
@@ -21,7 +21,7 @@
     </style>
 </head>
 <body>
-<h1>这是一个电商平台首页</h1>
+<h1>桃饱网！~</h1>
 {% if not is_login %}
 <form action="">
 <input type="button" name='id' id='id' value="用户入口" onclick="window.location.href='/buyer_login/'"></button>
@@ -34,6 +34,9 @@
     <h3>您好，尊敬的VIP顾客{{ name }}</h3>
     <input type="button" value="个人信息" onclick="window.location.href='/customer_info/'"></button>
     <input type="button" value="登出" onclick="window.location.href='/logout/'"></button>
+    <br>
+    <input type="button" value="购物车" onclick="window.location.href='/cart/'"></button>
+    <input type="button" value="订单管理" onclick="window.location.href='/order_info/'"></button>
     </div>
     {% elif is_login == 2 %}
     <div>
@@ -41,20 +44,43 @@
     <input type="button" value="发布商品" onclick="window.location.href='/create_good/'"></button>
     <input type="button" value="个人信息" onclick="window.location.href='/seller_info/'"></button>
     <input type="button" value="登出" onclick="window.location.href='/logout/'"></button>
+    <br>
+    <input type="button" value="订单管理" onclick="window.location.href='/deal_order/'"></button>
+    <input type="button" value="评论处理" onclick="window.location.href='/index/'"></button>
     </div>
 {% endif %}
 
-{% for item in goods %}
+{% for item in page_obj %}
      <div class="divcss5">
         <div style="color:#000000" >
-            <h3>@{{ item.seller.name}}</h3>
+            <h3>商品名：{{ item.item_name }}</h3>
         </div>
-        <img src="{{ MEDIA_URL }}item_img/default.jpg" height="100" width="100">
-         <p>{{ item.item_name }}</p>
+        <img src="{{ MEDIA_URL }}{{ item.item_img }}" height="100" width="100">
+         <p>@{{ item.seller.name}}</p>
          <h3>价格：{{ item.item_price }}元</h3>
      <a href="/good_info/{{ item.id }}/" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;查看详情</a>
     </div>
 {% endfor %}
+
+{% if is_paginated %}
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">上一页</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">下一页</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endif %}
 
 </body>
 </html>

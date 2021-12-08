@@ -148,14 +148,14 @@ class Seller_registerForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
-        if Customer.objects.filter(email=email).exists():
+        if Seller.objects.filter(email=email).exists():
             raise forms.ValidationError('该邮箱已被注册', code="email_invalid")
         else:
             return email
 
     def clean_name(self):
         name = self.cleaned_data.get("name")
-        if Customer.objects.filter(name=name).exists():
+        if Seller.objects.filter(name=name).exists():
             raise forms.ValidationError('该用户名已被注册', code="name_invalid")
         else:
             return name

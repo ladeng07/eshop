@@ -19,7 +19,7 @@ class Customer(models.Model):
 
 class Cart(models.Model):
     status_choice = ((0, "未下单"), (1, "已下单"))
-    item_id = models.IntegerField(verbose_name="商品ID")
+    item = models.ForeignKey("Goods",on_delete=models.CASCADE,verbose_name="商品ID")
     seller_id = models.IntegerField(verbose_name="卖家ID")
     buyer_id = models.IntegerField(verbose_name="买家ID")
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="添加时间")
@@ -35,6 +35,7 @@ class Order(models.Model):
     buyer = models.ForeignKey(to="Customer", verbose_name="买家ID", on_delete=models.CASCADE)
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     number = models.IntegerField(default=0, verbose_name="数量")
+    address = models.TextField(max_length=200, verbose_name="地址")
     sum_price = models.DecimalField(max_digits=20, decimal_places=2, default=0.0, null=True, blank=True,
                                     verbose_name="订单价格")
     status = models.IntegerField(choices=status_choice, default=0,
@@ -70,8 +71,6 @@ class Seller(models.Model):
     register_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name="注册时间")
     avatar = models.ImageField(upload_to="seller_avatar/", verbose_name="头像", default="seller_avatar/default.jpg")
     sex = models.CharField(max_length=10, verbose_name="性别", default=0)
-    # check_number = models.CharField(max_length=4, default="0", verbose_name="验证码")
-    # item = models.ForeignKey(to="Goods", on_delete=models.CASCADE, null=True)
 
 
 class ReComment(models.Model):

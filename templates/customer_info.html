@@ -3,17 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <title>用户个人信息页</title>
+    <style>
+        .divcss5 {
+            border: 1px solid #000;
+            width: 500px;
+            _height: 50px;
+            min-height: 50px;
+        }
+    </style>
 </head>
 <body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 <h1>用户个人信息</h1>
 <div>
+    <form method="POST" action="{% url 'app1:address' %}">
+    {% csrf_token %}
+
     <img src="{{ MEDIA_URL }}{{ form.avatar }}" height="200" width="200"><br>
     用户名:{{ form.name}}<br>
     邮箱:{{ form.email }}<br>
-    性别:{{ form.sex }}<br>
+    密码：
+    <input type="button" value="修改密码" onclick="window.location.href='/edit_password/'"></button><br>
+    性别:{{ form.get_sex_display }}<br>
     注册时间:{{ form.register_time }}<br>
     钱包余额:{{ form.money }}<br>
-    收获地址:
+    收获地址:<input type="text" name="address" value="{{ address.content }}">
+        {% if address %}
+            <input type="hidden" name="address_id" value={{ address.id }}>
+            <button type="submit">确认修改</button>
+            <input type="button" value="取消修改" onclick="window.location.href='/customer_info/'">
+        {% else %}
+            <input type="hidden" name="address_id" value=-1>
+        <button type="submit">增加地址</button>
+        {% endif %}
+
+    </form>
+
+        {% for i in address_set %}
+        <div class="divcss5">
+            地址 {{ forloop.counter }}  ：{{ i.content }}
+            <br>
+            <form method="POST" action="{% url 'app1:address' %}">
+                {% csrf_token %}
+                <input type="hidden" name="address_id" value={{ i.id }}>
+                {% if not address %}
+                <button type="submit">修改地址</button>
+                {% endif %}
+                </form>
+        </div>
+        {% endfor %}
+
 </div>
 </body>
 </html>

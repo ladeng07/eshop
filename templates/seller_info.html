@@ -10,7 +10,7 @@
     <img src="{{ MEDIA_URL }}{{ form.avatar }}" height="200" width="200"><br>
     用户名:{{ form.name}}<br>
     邮箱:{{ form.email }}<br>
-    性别:{{ form.sex }}<br>
+    性别:{{ form.get_sex_display }}<br>
     注册时间:{{ form.register_time }}<br>
 </div>
 </body>

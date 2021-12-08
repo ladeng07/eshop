@@ -58,7 +58,7 @@
         Email:&nbsp;&nbsp;&nbsp;&nbsp;
         <input type="email" name="email" value="{{ form.data.email }}">
     </label>
-    <input type="button" onclick="check_email(user_email)" value="获取验证码"></input>{{ form.errors.email.0 }}
+    <input type="button" onclick="check_email(email)" value="获取验证码">{{ form.errors.email.0 }}
     <br>
     <label>
         验证码:&nbsp;&nbsp;
