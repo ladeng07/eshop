@@ -55,34 +55,44 @@
     <p>商家：@{{ good.seller.name }}</p>
     <img src="{{ MEDIA_URL }}/{{ good.seller.avatar }}" height="80" width="80">
 </div>
-
+{% if customer.id %}
 <div>
     <h3>发布评论</h3>
 <form method="post" name="comment" action="{% url 'app1:comment'%}">
     <input type="hidden" name="item_id" value={{ good.id }}>
+    <input type="hidden" name="id" value={{ customer.id }}>
     {% csrf_token %}
     <textarea  rows="8" cols="67" name="content"></textarea>
     <br>
     <button type="submit">发布回复</button>&nbsp;
 </form>
 </div>
+{% endif %}
+
 {% for i in comment %}
 <div class="divcss5">
+
         {% if customer.id == i.commenter_id %}
         <div style="color:#d41212" >
         <h3>#{{ i.id }}&nbsp;&nbsp;{{ customer.name }}</h3>
         </div>
         {% else %}
-        <h3>#{{ i.id }}</h3>
+        <h3>#{{ i.id }}&nbsp;&nbsp;{{ customer.name }}</h3>
         {% endif %}
         <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ i.content}}</a>
         <p>{{ i.comment_time }}</p>
-        {% if customer.id == i.commenter_id %}
-            <input >
-        {% else %}
-        {% endif %}
+    {% if i.recomment.id %}
     </div>
+    <div style="color:#1767ff" >
+        <h3>商家回复：{{ i.content | truncatechars:8 }}</h3>
+        </div>
+    <div>
+        <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ i.recomment.content }}</a>
+    <p>{{ i.recomment.comment_time }}</p>
+    </div>
+
     <br>
+    {% endif %}
 {% endfor %}
 </body>
 </html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>回复评论</title>
+    <style>
+        .divcss5 {
+            border: 1px solid #000;
+            width:300px;
+            _height: 50px;
+            min-height: 50px;
+        }
+        textarea{
+            resize: none;
+        }
+        a{ text-decoration:none}
+        a{color: #000000
+        }
+        a:hover{color: #3174d0
+        }
+    </style>
+</head>
+<body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
+<h3>未回复评论</h3>
+{% for i in comment %}
+    {% if not i.recomment.id %}
+    <div class="divcss5">
+        <h3>#{{ i.id }}商品ID：{{ i.item_id }}</h3>
+        <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ i.content}}</a>
+        <p>{{ i.comment_time }}</p>
+    </div>
+    <br>
+<form method="post" name="comment" action="{% url 'app1:deal_comment'%}">
+    <input type="hidden" name="item_id" value={{ i.item_id }}>
+    <input type="hidden" name="id" value={{ i.id }}>
+    <input type="hidden" name="commenter_id" value={{ i.commenter_id }}>
+    {% csrf_token %}
+    <textarea  rows="8" cols="67" name="content"></textarea>
+    <br>
+    <button type="submit">发布回复</button>&nbsp;
+</form>
+    {% endif %}
+{% endfor %}
+<h3>已回复评论</h3>
+{% for i in comment %}
+    {% if i.recomment.id %}
+    <div class="divcss5">
+        <h3>#{{ i.id }}商品ID：{{ i.item_id }}</h3>
+        <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ i.content}}</a>
+        <p>{{ i.comment_time }}</p>
+        <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;你的回复：{{ i.recomment.content}}</a>
+        <p>{{ i.recomment.comment_time }}</p>
+    </div>
+    <br>
+{% endif %}
+{% endfor %}
+
+</body>
+</html>

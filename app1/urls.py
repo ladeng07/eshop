@@ -26,6 +26,11 @@ urlpatterns = [
         path('deal_order/',views.deal_order,name="deal_order"),
         path('reject_order/',views.reject_order,name="reject_order"),
         path('comment/',views.comment,name="comment"),
+        path('delete_comment/',views.delete_comment,name="delete_comment"),
+        path('deal_comment/',views.deal_comment,name="deal_comment"),
+        path('deal_good/',views.deal_good,name="deal_good"),
+        path('search/',views.search,name="search"),
+
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

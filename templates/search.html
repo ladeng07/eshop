@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索商品</title>
+     <style>
+        .divcss5 {
+            border: 1px solid #000;
+            width:300px;
+            _height: 50px;
+            min-height: 50px;
+        }
+        textarea{
+            resize: none;
+        }
+        a{ text-decoration:none}
+        a{color: #000000
+        }
+        a:hover{color: #3174d0
+        }
+    </style>
+</head>
+<body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
+<h3>搜索结果</h3>
+<form method="GET" action="{% url 'app1:search' %}">
+    {% csrf_token %}
+    <input type="search"  placeholder="搜索" required value={{ q }}>
+    <button type="submit">搜索</button>
+</form>
+<p>共搜索到{{ number }}个结果</p>
+{% if good %}
+
+{% for item in good %}
+     <div class="divcss5">
+        <div style="color:#000000" >
+            <h3>商品名：{{ item.item_name }}</h3>
+        </div>
+        <img src="{{ MEDIA_URL }}{{ item.item_img }}" height="100" width="100">
+         <p>@{{ item.seller.name}}</p>
+         <h3>价格：{{ item.item_price }}元</h3>
+     <a href="/good_info/{{ item.id }}/" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;查看详情</a>
+    </div>
+{% endfor %}
+
+{% endif %}
+
+</body>
+</html>

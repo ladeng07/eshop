@@ -15,6 +15,7 @@ class Customer(models.Model):
     avatar = models.ImageField(upload_to="user_avatar/", verbose_name="头像", default="user_avatar/default.jpg")
     register_time = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
     goods = models.ManyToManyField(to="Goods", through="Order")
+    status = models.BooleanField(default=True, verbose_name="账户状态")
 
 
 class Cart(models.Model):
@@ -54,6 +55,7 @@ class Goods(models.Model):
     item_price = models.DecimalField(max_digits=20, decimal_places=2, default=0.0, null=True, blank=True,
                                      verbose_name="价格")
     category_id = models.IntegerField(choices=categories, default=0, verbose_name="商品分类")
+    status = models.BooleanField(default=True, verbose_name="商品状态")
 
 
 class Comment(models.Model):
@@ -71,14 +73,15 @@ class Seller(models.Model):
     register_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name="注册时间")
     avatar = models.ImageField(upload_to="seller_avatar/", verbose_name="头像", default="seller_avatar/default.jpg")
     sex = models.CharField(max_length=10, verbose_name="性别", default=0)
+    status = models.BooleanField(default=True,verbose_name="账户状态")
 
 
 class ReComment(models.Model):
-    Comment_id = models.IntegerField(verbose_name="回复ID")
     commenter_id = models.IntegerField(verbose_name="回复者ID")
     content = models.TextField(max_length=1000, verbose_name="回复内容")
     comment_time = models.DateTimeField(auto_now_add=True, verbose_name="评论时间")
     status = models.BooleanField(default=True, verbose_name="状态")
+    comment = models.OneToOneField('Comment', verbose_name="回复ID", on_delete=models.CASCADE, default=-1)
 
 
 class Address(models.Model):

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品管理</title>
+    <style>
+        .divcss5 {
+            border: 1px solid #000;
+            width:300px;
+            _height: 50px;
+            min-height: 50px;
+        }
+        textarea{
+            resize: none;
+        }
+        a{ text-decoration:none}
+        a{color: #000000
+        }
+        a:hover{color: #3174d0
+        }
+    </style>
+</head>
+<body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
+<h3>商品管理</h3>
+{% for i in good %}
+    <form method="POST" action="">
+    {% csrf_token %}
+    <input type="hidden" name="id" value={{ i.id }}>
+        <div class="divcss5">
+            <div style="color:#000000" >
+                <h3>商品名：{{ i.item_name }}</h3>
+            </div>
+            <img src="{{ MEDIA_URL }}{{ i.item_img }}" height="100" width="100">
+             <p>@{{ i.seller.name}}</p>
+             <h3>价格：{{ i.item_price }}元</h3>
+         <a href="/good_info/{{ i.id }}/" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;查看详情</a>
+         {% if i.status %}
+             <input type="button" value="下架商品" type="submit" onclick="form.action='{% url "app1:deal_good" %}';form.submit();"/>
+        {% else %}
+             <input type="button" value="修改商品" type="submit" onclick="form.action='{% url "app1:create_good" %}';form.submit();"/>
+             <input type="button" value="上架商品" type="submit" onclick="form.action='{% url "app1:deal_good" %}';form.submit();"/>
+        {% endif %}
+        </div>
+    </form>
+{% endfor %}
+</body>
+</html>

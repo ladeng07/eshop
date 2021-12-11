@@ -33,6 +33,7 @@
 </script>
 </head>
 <body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 <h1>用户注册页面</h1>
 
 <form method="post" action="{% url 'app1:buyer_register'%}" id="register_form" name="register_form">
@@ -80,7 +81,6 @@
     <br>
     <button type="submit">立即注册</button>&nbsp;&nbsp;
     <input type="button" value="返回登录" onclick="window.location.href='/buyer_login/'"></button>&nbsp;&nbsp;
-    <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 </form>
 <br>
 

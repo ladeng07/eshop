@@ -5,6 +5,7 @@
     <title>商家登录界面</title>
 </head>
 <body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 <h1>商家登录界面</h1>
 <form method="post" action="{% url 'app1:seller_login'%}">
     {% csrf_token %}
@@ -36,7 +37,6 @@
     <input type="button" value="用户登录" onclick="window.location.href='/buyer_login/'"></button>&nbsp;&nbsp;&nbsp;&nbsp;
      <input type="button" value="找回密码" onclick="window.location.href='/edit_password/'"></button>
     <input type="button" value="注册" onclick="window.location.href='/seller_register/'"></button>&nbsp;&nbsp;&nbsp;&nbsp;
-    <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 
 </form>
 

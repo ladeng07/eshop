@@ -21,14 +21,16 @@
     </style>
 </head>
 <body>
+ <form method="GET" action="{% url 'app1:search' %}">
+    {% csrf_token %}
+    <input type="search" name="q" placeholder="搜索" required>
+    <button type="submit">搜索</button>
+</form>
+
 <h1>桃饱网！~</h1>
 {% if not is_login %}
-<form action="">
-<input type="button" name='id' id='id' value="用户入口" onclick="window.location.href='/buyer_login/'"></button>
-<input type="button" name='id' id='id' value="商家入口" onclick="window.location.href='/seller_login/'"></button>
-    <input type="file" name="avatar" value=“上传” alt="请选择正确的图片" accept="image/jpeg, image/jpg ,image/png"/>
-</form>
-<img src="{{ MEDIA_URL }}user_avatar/default.jpg" height="200" width="200">
+    <input type="button" name='id' id='id' value="用户入口" onclick="window.location.href='/buyer_login/'"></button>
+    <input type="button" name='id' id='id' value="商家入口" onclick="window.location.href='/seller_login/'"></button>
     {% elif is_login == 1 %}
     <div>
     <h3>您好，尊敬的VIP顾客{{ name }}</h3>
@@ -45,9 +47,12 @@
     <input type="button" value="个人信息" onclick="window.location.href='/seller_info/'"></button>
     <input type="button" value="登出" onclick="window.location.href='/logout/'"></button>
     <br>
+    <input type="button" value="商品管理" onclick="window.location.href='/deal_good/'"></button>
     <input type="button" value="订单管理" onclick="window.location.href='/deal_order/'"></button>
-    <input type="button" value="评论处理" onclick="window.location.href='/index/'"></button>
+    <input type="button" value="评论处理" onclick="window.location.href='/deal_comment/'"></button>
     </div>
+
+
 {% endif %}
 
 {% for item in page_obj %}

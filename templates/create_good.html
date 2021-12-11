@@ -11,28 +11,33 @@
 <form method="POST" action="{% url 'app1:create_good' %}" enctype="multipart/form-data">
     {% csrf_token %}
     <h3>发布商品</h3>
+    {% if good %}
+        <input type="hidden" name="item_id" value={{ good.id }}>
+    {% else %}
+        <input type="hidden" name="item_id" value=-1>
+    {% endif %}
     商品名称：
-    <input type="text" name="item_name" value=>
+    <input type="text" name="item_name" value={{ good.item_name }}>
     库存：
-    <input type="text" name="number">
+    <input type="text" name="number" value={{ good.number }}>
     价格：
-    <input type="text" name="item_price">
+    <input type="text" name="item_price" value={{ good.item_price }}>
     商品分类：
-    <select name="category_id">
+    <select name="category_id" value={{ good.category_id }}>
         <option>选择分类</option>
-        <option value=1>生活用品</option>
-        <option value=2>体育用品</option>
-        <option value=3>学习用品</option>
-        <option value=4>小吃零食</option>
-        <option value=5>服装</option>
-        <option value=6>电子产品</option>
-        <option value=0>其他</option>
+        <option value=1 {% if good.category_id == 1%} selected="selected" {% endif %}>生活用品</option>
+        <option value=2 {% if good.category_id == 2%} selected="selected" {% endif %}>体育用品</option>
+        <option value=3 {% if good.category_id == 3%} selected="selected" {% endif %}>学习用品</option>
+        <option value=4 {% if good.category_id == 4%} selected="selected" {% endif %}>小吃零食</option>
+        <option value=5 {% if good.category_id == 5%} selected="selected" {% endif %}>服装</option>
+        <option value=6 {% if good.category_id == 6%} selected="selected" {% endif %}>电子产品</option>
+        <option value=0 {% if good.category_id == 0%} selected="selected" {% endif %}>其他</option>
     </select>
     上传图片：
     <input type="file" name="item_img" value=“上传” id="item_img" accept="image/jpeg, image/jpg ,image/png"/>
     <br>
     商品详情：
-    <textarea name=item_introduction></textarea>
+    <textarea name=item_introduction value={{ good.item_introduction }}></textarea>
     <script type="text/javascript">CKEDITOR.replace('item_introduction');</script>
     <button type="submit">发布商品</button>
     <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>

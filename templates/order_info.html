@@ -78,18 +78,24 @@
 <div>
     <h4>历史订单</h4>
     {% for i in order_list4 %}
+        <form method="POST" action="{% url 'app1:delete_comment' %}">
         <div class="divcss5">
+        {% csrf_token %}
             商品名：{{ i.item.item_name }}<br>
             购买数量：{{ i.number }}<br>
             购买时间:{{ i.create_time }}<br>
             金额：{{ i.sum_price }}<br>
             收货地址：{{ i.address }}<br>
             订单状态：{{ i.get_status_display }}
-            <input type="button" value="商品详情" onclick="window.location.href='/good_info/{{ i.item.id }}/'"></button>
+            <input type="button" value="商品详情" onclick="window.location.href='/good_info/{{ i.item.id }}/'">
             {% if i.status == 4 %}
-            <input type="button" value="评论商品" onclick="window.location.href='/good_info/{{ i.item.id }}/'"></button>
+                <input type="button" value="评论商品" onclick="window.location.href='/good_info/{{ i.item.id }}/'">
+                <button type="submit">删除评论</button>
+                <input type="hidden" name="item_id" value={{ i.item_id }}>
+                <input type="hidden" name="id" value={{ i.buyer_id }}>
             {% endif %}
         </div>
+        </form>
     {% endfor %}
 </div>
 </body>

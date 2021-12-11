@@ -29,7 +29,7 @@
     <br>
 {% endfor %}
 <button type="submit">立即购买</button>
-    <input type="button" value="取消购买" onclick="window.location.href='/good_info/{{ i.item.id }}/'"><br>
+    <input type="button" value="取消购买" onclick="window.location.href='/cart/'"><br>
 </form>
 {% else %}
 
@@ -51,7 +51,7 @@
     </select>
     <br>
     <button type="submit">立即购买</button>
-    <input type="button" value="取消购买" onclick="window.location.href='/good_info/{{ item.id }}/'">
+    <input type="button" value="取消购买" onclick="window.location.href='/good_info/{{ i.id }}/'">
 </form>
 
 {% endif %}

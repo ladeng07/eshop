@@ -32,7 +32,7 @@
     }
 </script>
 <body>
-
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 <h1>商家注册页面</h1>
 
 <form method="post" action="{% url 'app1:seller_register'%}" id="register_form" name="register_form">
@@ -78,7 +78,6 @@
     <br>
     <button type="submit">立即注册</button>&nbsp;&nbsp;
     <input type="button" value="返回登录" onclick="window.location.href='/seller_login/'"></button>&nbsp;&nbsp;
-    <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 </form>
 {% if errmsg %}
     {{ errmsg }}

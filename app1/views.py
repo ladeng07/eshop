@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponse,Http404
+from django.shortcuts import render, redirect, HttpResponse, Http404
 from app1.forms import *
 from app1.models import *
 from captcha.captcha import captcha
@@ -7,6 +7,7 @@ from eshop.settings import MEDIA_ROOT
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator
+from django.utils import timezone
 from app1.tasks import send_email
 import base64
 import random
@@ -15,23 +16,22 @@ import random
 # Create your views here.
 
 
-
 def index(request):
     if request.method == "GET":
         data = {}
         if request.session.get("is_login") == 1:
-            user = Customer.objects.filter(id=request.session.get("id"))[0]
+            user = Customer.objects.filter(id=request.session.get("id")).first()
             data["is_login"] = request.session.get("is_login")
             data["name"] = user.name
             data["id"] = request.session.get("id")
         elif request.session.get("is_login") == 2:
-            seller = Seller.objects.filter(id=request.session.get("id"))[0]
+            seller = Seller.objects.filter(id=request.session.get("id")).first()
             data["is_login"] = request.session.get("is_login")
             data["name"] = seller.name
             data["id"] = request.session.get("id")
-        goods = Goods.objects.all().order_by("-id")
-        paginator = Paginator(goods,3)
-        page_num = request.GET.get('page',1)
+        goods = Goods.objects.filter(status=True).order_by("-id")
+        paginator = Paginator(goods, 3)
+        page_num = request.GET.get('page', 1)
         data["page_obj"] = paginator.get_page(page_num)
         is_paginated = True if paginator.num_pages > 1 else False
         data["is_paginated"] = is_paginated
@@ -41,10 +41,11 @@ def index(request):
             raise Http404()
 
 
-
 def buyer_register(request):
-    if request.method == "GET":
+    if request.method == "GET" and not request.session.get("is_login"):
         return render(request, "buyer_register.html")
+    elif request.session.get("is_login"):
+        raise Http404()
     else:
         if request.is_ajax():
             email = request.POST.get("email")
@@ -54,9 +55,9 @@ def buyer_register(request):
                 return HttpResponse("该邮箱已被注册")
             if cache.has_key(email):
                 return HttpResponse("验证码已发送，请5分钟后重试")
-            verify_code = str(random.randint(1000,10000))
+            verify_code = str(random.randint(1000, 10000))
             cache.set(email, verify_code, 180)
-            send_email(request.POST.get("email"),verify_code)
+            send_email(request.POST.get("email"), verify_code)
             return HttpResponse("验证码发送成功！")
         else:
             form = Customer_registerForm(request.POST)
@@ -82,8 +83,10 @@ def buyer_register(request):
 
 
 def seller_register(request):
-    if request.method == "GET":
+    if request.method == "GET" and not request.session.get("is_login"):
         return render(request, "seller_register.html")
+    elif request.session.get("is_login"):
+        raise Http404()
     else:
         if request.is_ajax():
             email = request.POST.get("email")
@@ -91,11 +94,11 @@ def seller_register(request):
                 return HttpResponse("请输入邮箱！")
             if Seller.objects.filter(email=email):
                 return HttpResponse("该邮箱已被注册")
-            if cache.has_key("seller"+email):
+            if cache.has_key("seller" + email):
                 return HttpResponse("验证码已发送，请5分钟后重试")
-            verify_code = str(random.randint(1000,10000))
-            cache.set("seller"+email, verify_code, 180)
-            send_email(request.POST.get("email"),verify_code)
+            verify_code = str(random.randint(1000, 10000))
+            cache.set("seller" + email, verify_code, 180)
+            send_email(request.POST.get("email"), verify_code)
             return HttpResponse("验证码发送成功！")
         else:
 
@@ -110,11 +113,11 @@ def seller_register(request):
                 email = request.POST.get("email")
                 sex = request.POST.get("sex")
                 check_number = request.POST.get("check_number")
-                verify_code = cache.get("seller"+email)
+                verify_code = cache.get("seller" + email)
                 if verify_code != check_number:
                     return HttpResponse("<script>alert('验证码输入错误');window.history.back(-1);</script>")
                 Seller.objects.create(name=name, password=password, email=email, sex=sex)
-                cache.delete("seller"+email)
+                cache.delete("seller" + email)
                 return HttpResponse("<script>alert('注册成功！');window.location.href='/index/';</script>")
             else:
                 print(form.errors)
@@ -123,7 +126,7 @@ def seller_register(request):
 
 
 def buyer_login(request):
-    if request.method == "GET":
+    if request.method == "GET" and not request.session.get("is_login"):
         text, image = captcha.generate_captcha()
         number = 0
         while cache.has_key("k%d" % number):
@@ -132,7 +135,8 @@ def buyer_login(request):
         image = base64.b64encode(image).decode()
         data = {"k": number, "image": image}
         return render(request, "buyer_login.html", data)
-
+    elif request.session.get("is_login"):
+        raise Http404()
     else:
         form = Customer_loginForm(request.POST)
         k = "k" + request.POST.get("k")
@@ -164,7 +168,7 @@ def buyer_login(request):
 
 
 def seller_login(request):
-    if request.method == "GET":
+    if request.method == "GET" and not request.session.get("is_login"):
         text, image = captcha.generate_captcha()
         number = 0
         while cache.has_key("k%d" % number):
@@ -173,7 +177,8 @@ def seller_login(request):
         image = base64.b64encode(image).decode()
         data = {"k": number, "image": image}
         return render(request, "seller_login.html", data)
-
+    elif request.session.get("is_login"):
+        raise Http404()
     else:
         form = Seller_loginForm(request.POST)
         k = "k" + request.POST.get("k")
@@ -206,37 +211,38 @@ def seller_login(request):
 
 
 def customer_info(request):
-    if request.method == "GET":
+    if request.method == "GET" and request.session.get("is_login") == 1:
         id = request.session.get("id")
         form = Customer.objects.filter(id=id).first()
         address_set = Address.objects.filter(customer_id=id)
         return render(request, "customer_info.html", {"form": form, "address_set": address_set})
     else:
-        return render(request, "customer_info.html")
+        raise Http404()
 
 
 def seller_info(request):
-    if request.method == "GET":
-        form = Seller.objects.filter(id=request.session.get("id"))[0]
+    if request.method == "GET" and request.session.get("is_login") == 2:
+        form = Seller.objects.filter(id=request.session.get("id")).first()
         return render(request, "seller_info.html", {'form': form})
     else:
-        return render(request, "seller_info.html")
+        raise Http404()
 
 
 def good_info(request, id):
     if request.session.get("id") == 1:
-        good = Goods.objects.filter(id=id)[0]
+        good = Goods.objects.filter(id=id, status=True).first()
         if not good:
-            return HttpResponse("<script>alert('该商品不存在！');window.location.href='/index/';</script>")
-        comments = Comment.objects.filter(item_id=id)
-        customer = Customer.objects.filter(id=request.session.get("id"))
-        return render(request, "good_info.html", {"good": good,"comment":comments,"customer":customer})
+            return HttpResponse("<script>alert('该商品不存在或已下架！');window.location.href='/index/';</script>")
+        comments = Comment.objects.filter(item_id=id, status=True)
+        customer = Customer.objects.filter(id=request.session.get("id")).first()
+        return render(request, "good_info.html", {"good": good, "comment": comments, "customer": customer})
     else:
-        good = Goods.objects.filter(id=id)[0]
+        good = Goods.objects.filter(id=id).first()
         if not good:
             return HttpResponse("<script>alert('该商品不存在！');window.location.href='/index/';</script>")
-        comments = Comment.objects.filter(item_id=id)
-        return render(request, "good_info.html", {"good": good, "comment": comments,})
+        comments = Comment.objects.filter(item_id=id, status=True)
+        return render(request, "good_info.html", {"good": good, "comment": comments, })
+
 
 def logout(request):
     if request.session.get("is_login"):
@@ -247,42 +253,84 @@ def logout(request):
 
 
 def create_good(request):
-    if request.method == "GET":
+    if request.method == "GET" and request.session.get("is_login") == 2:
         return render(request, "create_good.html")
-    else:
-        image = request.FILES.get("item_img", None)
-        item_name = request.POST.get("item_name")
-        item_introdcution = request.POST.get("item_introduction")
-        item_price = request.POST.get("item_price")
-        number = request.POST.get("number")
-        category_id = request.POST.get("category_id")
-        print(image.read)
-        if not item_name:
-            return HttpResponse("<script>alert('请输入商品名');window.history.back(-1)</script>")
-        if not image:
-            return HttpResponse("<script>alert('请上传图片');window.history.back(-1)</script>")
-        if not item_introdcution:
-            return HttpResponse("<script>alert('请输入商品介绍！');window.history.back(-1)</script>")
-        if not category_id:
-            return HttpResponse("<script>alert('请选择分类标签！');window.history.back(-1)</script>")
-        if not number and number.strip().is_number() and number >= 0:
-            return HttpResponse("<script>alert('请输入库存！');window.history.back(-1)</script>")
-        item_img = image.name.split(".")
-        item_img = "item_img/{}.{}".format(request.session.get("id"), item_img[1])
-        default_storage.save(MEDIA_ROOT + "/" + item_img, ContentFile(image.read()))
+    elif request.method == "POST" and request.session.get("is_login") == 2:
+        if request.POST.get("item_id") == '-1':
+            image = request.FILES.get("item_img", None)
+            item_name = request.POST.get("item_name")
+            item_introdcution = request.POST.get("item_introduction")
+            item_price = request.POST.get("item_price")
+            number = request.POST.get("number")
+            category_id = request.POST.get("category_id")
+            if not item_name:
+                return HttpResponse("<script>alert('请输入商品名');window.history.back(-1)</script>")
+            if not image:
+                return HttpResponse("<script>alert('请上传图片');window.history.back(-1)</script>")
+            if not item_introdcution:
+                return HttpResponse("<script>alert('请输入商品介绍！');window.history.back(-1)</script>")
+            if not category_id:
+                return HttpResponse("<script>alert('请选择分类标签！');window.history.back(-1)</script>")
+            if not item_price or not item_price.strip().isdecimal() or int(item_price):
+                return HttpResponse("<script>alert('请输入正确的价格！');window.history.back(-1)</script>")
+            if not number or not number.strip().isdecimal() or int(number) < 0:
+                return HttpResponse("<script>alert('请输入库存！');window.history.back(-1)</script>")
+            item_img = image.name.split(".")
+            item_img = "item_img/{}.{}".format(request.session.get("id"), item_img[1])
+            default_storage.save(MEDIA_ROOT + "/" + item_img, ContentFile(image.read()))
 
-        Goods.objects.create(item_name=item_name, item_introduction=item_introdcution,
-                             seller_id=request.session.get("id"), item_price=item_price, item_img=item_img,
-                             number=number)
-        return HttpResponse("<script>alert('发布商品成功！');window.location.href='/index/'</script>")
+            Goods.objects.create(item_name=item_name, item_introduction=item_introdcution,
+                                 seller_id=request.session.get("id"), item_price=item_price, item_img=item_img,
+                                 number=number)
+            return HttpResponse("<script>alert('发布商品成功！');window.location.href='/index/'</script>")
+        elif request.POST.get("item_id"):
+            item_id = int(request.POST.get("item_id"))
+            good = Goods.objects.filter(id=item_id, status=False)
+            item_name = request.POST.get("item_name")
+            number = request.POST.get("number")
+            item_price = request.POST.get("item_price")
+            item_img = request.POST.get("item_img")
+            category_id = request.POST.get("category_id")
+            item_introduction = request.POST.get("item_introduction")
+
+            if not good:
+                return HttpResponse("<script>alert('该商品不存在或未下架！');window.history.back(-1)</script>")
+            if not request.POST.get("item_name"):
+                return HttpResponse("<script>alert('请输入商品名称');window.history.back(-1)</script>")
+            if not request.POST.get("number") or not number.strip().isdecimal() or int(number) < 0:
+                return HttpResponse("<script>alert('请输入正确的数量！');window.history.back(-1)</script>")
+            if not request.POST.get("item_price") or not item_price.strip().isdecimal() or float(item_price) < 0:
+                return HttpResponse("<script>alert('请输入正确的价格！');window.history.back(-1)</script>")
+
+
+            if not request.POST.get("item_img"):
+                good.update(item_name=item_name, number=int(number), item_price=float(item_price),
+                            category_id=int(category_id), item_introduction=item_introduction,
+                            create_time=timezone.now())
+                return HttpResponse("<script>alert('修改成功');window.location.href='/deal_good/';</script>")
+            if not request.POST.get("item_introduction"):
+                good.update(item_name=item_name, number=int(number), item_price=float(item_price),
+                            category_id=int(category_id), item_img=item_img, create_time=timezone.now())
+                return HttpResponse("<script>alert('修改成功');window.location.href='/deal_good/';</script>")
+            good.update(item_name=item_name, number=int(number), item_price=float(item_price),
+                        category_id=int(category_id), item_introduction=item_introduction, item_img=item_img,
+                        create_time=timezone.now())
+            return HttpResponse("<script>alert('修改成功');window.location.href='/deal_good/';</script>")
+        else:
+            item_id = int(request.POST.get("id"))
+            good = Goods.objects.filter(id=item_id).first()
+            data = {"good": good}
+            return render(request, "create_good.html", data)
+    else:
+        raise Http404()
 
 
 def cart(request):
-    if request.method == "GET":
-        order = Cart.objects.filter(buyer_id=request.session.get("id"),status=0)
-        data={"order":order}
-        return render(request,"cart.html",data)
-    else:
+    if request.method == "GET" and request.session.get("is_login") == 1:
+        order = Cart.objects.filter(buyer_id=request.session.get("id"), status=0)
+        data = {"order": order}
+        return render(request, "cart.html", data)
+    elif request.method == "POST" and request.session.get("is_login") == 1:
         number = request.POST.get("number")
         item_id = request.POST.get("item_id")
         buyer_id = request.session.get("id")
@@ -296,21 +344,20 @@ def cart(request):
         Cart.objects.create(item=item, seller_id=item.seller_id, buyer_id=buyer_id, number=int(number),
                             sum_price=price, status=0)
         return HttpResponse("<script>alert('添加购物车成功！');window.location.href='/cart/'</script>")
-
-
+    else:
+        raise Http404()
 
 
 def order(request):
-    if request.method == "POST":
+    if request.method == "POST" and request.session.get("is_login") == 1:
         buy_id = request.session.get("id")
         customer = Customer.objects.filter(id=buy_id).first()
         if request.POST.getlist("item_id_set") and request.POST.get("status") == "1":
-            item_id_set = list(map(int,request.POST.getlist("item_id_set")))
+            item_id_set = list(map(int, request.POST.getlist("item_id_set")))
             item_set = Cart.objects.filter(id__in=item_id_set)
-            data = {"item_set":item_set,"customer":customer}
-            print(data)
-            return render(request,"order.html",data)
-        else:
+            data = {"item_set": item_set, "customer": customer}
+            return render(request, "order.html", data)
+        elif request.POST.get("status") == "1":
             return HttpResponse("<script>alert('请选择商品再下单！');window.history.back(-1);</script>")
         number = request.POST.get("number")
         item_id = request.POST.get("item_id")
@@ -323,12 +370,13 @@ def order(request):
             item_id = request.POST.getlist("item_id")
             for i in range(len(item_id)):
                 item = Goods.objects.filter(id=item_id[i]).first()
-                Order.objects.create(number=int(number[i]), sum_price=int(number[i]) * item.item_price, buyer_id=buy_id, status=0,
-                                 item_id=item_id[i], address=Address.objects.filter(id=address[i]).first().content)
+                Order.objects.create(number=int(number[i]), sum_price=int(number[i]) * item.item_price, buyer_id=buy_id,
+                                     status=0,
+                                     item_id=item_id[i], address=Address.objects.filter(id=address[i]).first().content)
                 money = customer.money
                 customer.money = money - int(number[i]) * item.item_price
                 customer.save()
-            Cart.objects.filter(id__in=item_id).update(status=1)
+            Cart.objects.filter(item_id__in=item_id).update(status=1)
             return HttpResponse("<script>alert('下单成功');window.location.href='/index/';</script>")
 
         else:
@@ -341,6 +389,8 @@ def order(request):
             price = int(number) * item.item_price
             data = {"item": item, "customer": customer, "number": number, "price": price}
             return render(request, "order.html", data)
+    else:
+        raise Http404()
 
 
 def order_info(request):
@@ -354,10 +404,12 @@ def order_info(request):
         data = {"order": order, "order_list1": order_list1, "order_list2": order_list2, "order_list3": order_list3,
                 "order_list4": order_list4, }
         return render(request, "order_info.html", data)
-    elif request.session.get("is_login") == 1:
+    elif request.method == "POST" and request.session.get("is_login") == 1:
         order_id = request.POST.get("id")
         Order.objects.filter(id=order_id).update(status=4)
         return HttpResponse("<script>alert('操作成功');window.location.href='/order_info/';</script>")
+    else:
+        raise Http404()
 
 
 def comment(request):
@@ -365,15 +417,19 @@ def comment(request):
         content = request.POST.get("content")
         if not content:
             return HttpResponse("<script>alert('回复不能为空');window.history.back(-1)</script>")
-        Comment.objects.create(content=content,commenter_id=int(request.session.get("id")),item_id=int(request.POST.get("item_id")))
-        return HttpResponse("<script>alert('回复成功');window.location.href='/good_info/{}/'</script>".format(int(request.POST.get("item_id"))))
-    elif request.method == "GET" and request.session.get("is_login") == '2':
-        pass
+        if Comment.objects.filter(commenter_id=int(request.POST.get("id"))):
+            return HttpResponse("<script>alert('你已经评论过该商品！！');window.history.back(-1)</script>")
+        Comment.objects.create(content=content, commenter_id=int(request.session.get("id")),
+                               item_id=int(request.POST.get("item_id")))
+        return HttpResponse("<script>alert('回复成功');window.location.href='/good_info/{}/'</script>".format(
+            int(request.POST.get("item_id"))))
+    else:
+        return HttpResponse("<script>alert('不能评论商品！');window.history.back(-1);</script>")
 
 
 def address(request):
     address_id = request.POST.get("address_id")
-    if request.method == "POST":
+    if request.method == "POST" and request.session.get("is_login") == 1:
         if address_id == '-1':  # 增加收货地址
             address = request.POST.get("address")
             if address:
@@ -395,10 +451,13 @@ def address(request):
             return render(request, "customer_info.html", {"form": form, "address_set": address_set,
                                                           "address": Address.objects.filter(
                                                               id=request.POST.get("address_id")).first()})
+    else:
+        raise Http404()
+
 
 def edit_password(request):
     if request.method == "GET":
-        return render(request,"edit_password.html")
+        return render(request, "edit_password.html")
     else:
         if request.is_ajax():
             email = request.POST.get("email")
@@ -406,10 +465,10 @@ def edit_password(request):
                 return HttpResponse("请输入邮箱！")
             if not Customer.objects.filter(email=email):
                 return HttpResponse("该邮箱尚未注册")
-            if cache.has_key("find"+email):
+            if cache.has_key("find" + email):
                 return HttpResponse("验证码已发送，请1分钟后重试")
             verify_code = str(random.randint(1000, 10000))
-            cache.set("find"+email, verify_code, 60)
+            cache.set("find" + email, verify_code, 60)
             send_email(request.POST.get("email"), verify_code)
             return HttpResponse("验证码发送成功！")
         elif request.POST.get("password"):
@@ -423,26 +482,28 @@ def edit_password(request):
             if password == customer.first().password:
                 return HttpResponse("<script>alert('新密码与原密码相同，请检查');window.history.back(-1);</script>")
             customer.update(password=password)
-            cache.delete("find"+request.POST.get("email"))
+            cache.delete("find" + request.POST.get("email"))
             return HttpResponse("<script>alert('修改成功');window.location.href='/buyer_login/';</script>")
         else:
-            if request.POST.get("check_number") == cache.get("find"+request.POST.get("email")):
-                data = {"status":1,"email":request.POST.get("email")}
-                return render(request,"edit_password.html",data)
-            elif not cache.get("find"+request.POST.get("email")):
+            if request.POST.get("check_number") == cache.get("find" + request.POST.get("email")):
+                data = {"status": 1, "email": request.POST.get("email")}
+                return render(request, "edit_password.html", data)
+            elif not cache.get("find" + request.POST.get("email")):
                 return HttpResponse("<script>alert('请获取验证码');window.history.back(-1);</script>")
             else:
                 return HttpResponse("<script>alert('验证码错误！');window.history.back(-1);</script>")
 
+
 def deal_order(request):
     if request.method == "GET" and request.session.get("is_login") == 2:
-        order = Order.objects.filter(item_id__in=Seller.objects.filter(id=request.session.get("id")).first().goods_set.all())
+        order = Order.objects.filter(
+            item_id__in=Seller.objects.filter(id=request.session.get("id")).first().goods_set.all())
         order_list1 = order.filter(status=0)
         order_list2 = order.filter(status=3)
-        order_list3 = order.filter(status__in=[1,2,4])
-        data={"order_list1":order_list1,"order_list2":order_list2,"order_list3":order_list3}
-        return render(request,"deal_order.html",data)
-    elif request.session.get("is_login") == 2:
+        order_list3 = order.filter(status__in=[1, 2, 4])
+        data = {"order_list1": order_list1, "order_list2": order_list2, "order_list3": order_list3}
+        return render(request, "deal_order.html", data)
+    elif request.method == "POST" and request.session.get("is_login") == 2:
         order_id = int(request.POST.get("id"))
         order = Order.objects.filter(id=order_id).first()
         good = Goods.objects.filter(id=order.item_id).first()
@@ -454,8 +515,75 @@ def deal_order(request):
         Order.objects.filter(id=order_id).update(status=3)
         return HttpResponse("<script>alert('操作成功');window.location.href='/deal_order/';</script>")
 
+
 def reject_order(request):
     if request.method == "POST" and request.session.get("is_login") == 2:
         item_id = int(request.POST.get("id"))
-        Order.objects.filter(id=item_id).update(status=2)
+        order = Order.objects.filter(id=item_id)
+        order.update(status=2)
+        customer = Customer.objects.filter(id=order.first().buyer_id)
+        money = customer.first().money
+        money += order.first().sum_price
+        customer.update(money=money)
         return HttpResponse("<script>alert('操作成功');window.location.href='/deal_order/';</script>")
+    else:
+        raise Http404()
+
+
+def delete_comment(request):
+    if request.method == "POST" and request.session.get("is_login") == 1:
+        comment = Comment.objects.filter(commenter_id=int(request.POST.get("id")),
+                                         item_id=int(request.POST.get("item_id")), status=True)
+        if not comment:
+            return HttpResponse("<script>alert('该评论不存在');window.history.back(-1);</script>")
+        comment.update(status=False)
+        return HttpResponse("<script>alert('删除评论成功');window.location.href='/order_info/';</script>")
+    elif request.method == "POST" and request.session.get("is_login") == 2:
+        pass
+
+
+def deal_comment(request):
+    if request.method == "GET" and request.session.get("is_login") == 2:
+        item_id = Goods.objects.filter(seller_id=request.session.get("id")).values_list('id', flat=True)
+        comment = Comment.objects.filter(item_id__in=item_id, status=True)
+        data = {"comment": comment}
+        return render(request, "deal_comment.html", data)
+    elif request.method == "POST" and request.session.get("is_login") == 2:
+        content = request.POST.get("content")
+        if not content:
+            return HttpResponse("<script>alert('回复不能为空');window.history.back(-1)</script>")
+        if ReComment.objects.filter(commenter_id=int(request.POST.get("id"))):
+            return HttpResponse("<script>alert('你已经回复过该评论！！');window.history.back(-1)</script>")
+        ReComment.objects.create(content=content, commenter_id=int(request.POST.get("commenter_id")),
+                                 comment_id=int(request.POST.get("id")))
+        return HttpResponse("<script>alert('回复成功');window.location.href='/good_info/{}/'</script>".format(
+            int(request.POST.get("item_id"))))
+    else:
+        raise Http404()
+
+
+def deal_good(request):
+    if request.method == "GET" and request.session.get("is_login") == 2:
+        good = Goods.objects.filter(seller_id=request.session.get("id"))
+        data = {"good": good}
+        return render(request, "deal_good.html", data)
+    elif request.method == "POST" and request.session.get("is_login") == 2:
+        item_id = int(request.POST.get("id"))
+        good = Goods.objects.filter(id=item_id)
+        status = good.first().status
+        good.update(status=bool(1 - status))
+        return HttpResponse("<script>alert('操作成功！');window.location.href='/deal_good/';</script>")
+    else:
+        raise Http404()
+
+
+def search(request):
+    if request.method == "GET":
+        q = request.GET.get("q")
+        if not q:
+            return HttpResponse("<script>alert('请输入搜索内容！');window.history.back(-1);</script>")
+        good = Goods.objects.filter(item_name__icontains=q)
+        data = {"good": good, "q": q, "number": len(good)}
+        return render(request, "search.html", data)
+    else:
+        raise Http404()
