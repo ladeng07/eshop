@@ -16,17 +16,27 @@
 <input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 <h1>用户个人信息</h1>
 <div>
-    <form method="POST" action="{% url 'app1:address' %}">
-    {% csrf_token %}
 
+
+    <form method="POST" action={% url 'app1:customer_info' %} enctype="multipart/form-data">
+    {% csrf_token %}
     <img src="{{ MEDIA_URL }}{{ form.avatar }}" height="200" width="200"><br>
-    用户名:{{ form.name}}<br>
-    邮箱:{{ form.email }}<br>
-    密码：
+    上传头像：<input type="file" name="avatar" value=“上传” id="item_img" accept="image/jpeg, image/jpg ,image/png"/><br>
+    用户名:<input type="text" name="name" value={{ form.name}}><br>
+    邮箱:<input type="text" name="email" value={{ form.email }}><br>
+    性别：<select name="sex">
+        <option value=0 {% if form.sex == 0%} selected="selected" {% endif %}>男</option>
+        <option value=1 {% if form.sex == 1%} selected="selected" {% endif %}>女</option>
+        <option value=2 {% if form.sex == 2%} selected="selected" {% endif %}>其他</option>
+    </select><br>
+    钱包余额:<input type="text" name="money" value={{ form.money }}><br>
+    <button type="submit">修改信息</button>
+    </form>
+     密码：
     <input type="button" value="修改密码" onclick="window.location.href='/edit_password/'"></button><br>
-    性别:{{ form.get_sex_display }}<br>
-    注册时间:{{ form.register_time }}<br>
-    钱包余额:{{ form.money }}<br>
+     注册时间:{{ form.register_time }}<br>
+    <form method="POST" action="{% url 'app1:address' %}">
+     {% csrf_token %}
     收获地址:<input type="text" name="address" value="{{ address.content }}">
         {% if address %}
             <input type="hidden" name="address_id" value={{ address.id }}>

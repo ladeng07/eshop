@@ -10,10 +10,21 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from app1.tasks import send_email
 import base64
-import random
+import random, os
 
 
 # Create your views here.
+def is_number(s):
+    try:
+        s = str(float(s))
+    except:
+        return False
+    num = float(s)
+    print(len(s.split('.')[1]))
+    if num > 0 and len(s.split('.')[1]) < 3:
+        return True
+    else:
+        return False
 
 
 def index(request):
@@ -216,16 +227,69 @@ def customer_info(request):
         form = Customer.objects.filter(id=id).first()
         address_set = Address.objects.filter(customer_id=id)
         return render(request, "customer_info.html", {"form": form, "address_set": address_set})
-    else:
-        raise Http404()
+    elif request.method == "POST" and request.session.get("is_login") == 1:
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        sex = request.POST.get('sex')
+        money = request.POST.get('money')
+        avatar = request.FILES.get("avatar", None)
+        if not 3 < len(name) < 12:
+            return HttpResponse("<script>alert('请输入正确的用户名！');window.history.back(-1);</script>")
+        if not email or Customer.objects.filter(email=email).first().id != request.session.get("id"):
+            return HttpResponse("<script>alert('请输入正确的邮箱！');window.history.back(-1);</script>")
+        if not sex or sex not in ['1', '2', '0']:
+            return HttpResponse("<script>alert('请输入选择正确的性别！');window.history.back(-1);</script>")
+        if not money or not is_number(money):
+            return HttpResponse("<script>alert('请输入选择正确的金额！');window.history.back(-1);</script>")
+        customer = Customer.objects.filter(id=request.session.get('id'))
+        if avatar:
+            img_list = avatar.name.split(".")
+            if str(customer.first().avatar) != 'customer_avatar/default.jpg':
+                os.remove(MEDIA_ROOT + '/' + str(customer.first().avatar))
+            item_img = "customer_avatar/{}.{}".format(request.session.get("id"), img_list[1])
+            i = 0
+            while os.path.exists(MEDIA_ROOT + "/" + item_img):
+                i += 1
+                item_img = "customer_avatar/{}({}).{}".format(request.session.get("id"), i, img_list[1])
+            default_storage.save(MEDIA_ROOT + "/" + item_img, ContentFile(avatar.read()))
+            customer.update(name=name, email=email, sex=sex, avatar=item_img)
+            return HttpResponse("<script>alert('修改成功!');window.location.href='/customer_info/';</script>")
+
+        customer.update(name=name, email=email, sex=sex, money=money)
+        return HttpResponse("<script>alert('修改成功!');window.location.href='/customer_info/';</script>")
 
 
 def seller_info(request):
     if request.method == "GET" and request.session.get("is_login") == 2:
         form = Seller.objects.filter(id=request.session.get("id")).first()
         return render(request, "seller_info.html", {'form': form})
-    else:
-        raise Http404()
+    elif request.method == "POST" and request.session.get("is_login") == 2:
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        sex = request.POST.get('sex')
+        avatar = request.FILES.get("avatar", None)
+        if not 3 < len(name) < 12:
+            return HttpResponse("<script>alert('请输入正确的用户名！');window.history.back(-1);</script>")
+        if not email or Seller.objects.filter(email=email).first().id != request.session.get("id"):
+            return HttpResponse("<script>alert('请输入正确的邮箱！');window.history.back(-1);</script>")
+        if not sex or sex not in ['1', '2', '0']:
+            return HttpResponse("<script>alert('请输入选择正确的性别！');window.history.back(-1);</script>")
+        seller = Seller.objects.filter(id=request.session.get('id'))
+        if avatar:
+            img_list = avatar.name.split(".")
+            if str(seller.first().avatar) != 'seller_avatar/default.jpg':
+                os.remove(MEDIA_ROOT+'/'+ str(seller.first().avatar))
+            item_img = "seller_avatar/{}.{}".format(request.session.get("id"), img_list[1])
+            i = 0
+            while os.path.exists(MEDIA_ROOT + "/" + item_img):
+                i += 1
+                item_img = "seller_avatar/{}({}).{}".format(request.session.get("id"), i, img_list[1])
+            default_storage.save(MEDIA_ROOT + "/" + item_img, ContentFile(avatar.read()))
+            seller.update(name=name, email=email, sex=sex,avatar=item_img)
+            return HttpResponse("<script>alert('修改成功!');window.location.href='/seller_info/';</script>")
+
+        seller.update(name=name, email=email, sex=sex)
+        return HttpResponse("<script>alert('修改成功!');window.location.href='/seller_info/';</script>")
 
 
 def good_info(request, id):
@@ -271,12 +335,17 @@ def create_good(request):
                 return HttpResponse("<script>alert('请输入商品介绍！');window.history.back(-1)</script>")
             if not category_id:
                 return HttpResponse("<script>alert('请选择分类标签！');window.history.back(-1)</script>")
-            if not item_price or not item_price.strip().isdecimal() or int(item_price):
+            if not item_price or not is_number(item_price.strip()):
                 return HttpResponse("<script>alert('请输入正确的价格！');window.history.back(-1)</script>")
-            if not number or not number.strip().isdecimal() or int(number) < 0:
+            if not number or not number.strip().isdecimal():
                 return HttpResponse("<script>alert('请输入库存！');window.history.back(-1)</script>")
-            item_img = image.name.split(".")
-            item_img = "item_img/{}.{}".format(request.session.get("id"), item_img[1])
+            img_list = image.name.split(".")
+            item_img = "item_img/{}.{}".format(request.session.get("id"), img_list[1])
+            i = 0
+            print(MEDIA_ROOT + "/" + item_img)
+            while os.path.exists(MEDIA_ROOT + "/" + item_img):
+                i += 1
+                item_img = "item_img/{}({}).{}".format(request.session.get("id"), i, img_list[1])
             default_storage.save(MEDIA_ROOT + "/" + item_img, ContentFile(image.read()))
 
             Goods.objects.create(item_name=item_name, item_introduction=item_introdcution,
@@ -297,11 +366,10 @@ def create_good(request):
                 return HttpResponse("<script>alert('该商品不存在或未下架！');window.history.back(-1)</script>")
             if not request.POST.get("item_name"):
                 return HttpResponse("<script>alert('请输入商品名称');window.history.back(-1)</script>")
-            if not request.POST.get("number") or not number.strip().isdecimal() or int(number) < 0:
+            if not request.POST.get("number") or not number.strip().isdecimal():
                 return HttpResponse("<script>alert('请输入正确的数量！');window.history.back(-1)</script>")
-            if not request.POST.get("item_price") or not item_price.strip().isdecimal() or float(item_price) < 0:
+            if not request.POST.get("item_price") or not is_number(item_price.strip()):
                 return HttpResponse("<script>alert('请输入正确的价格！');window.history.back(-1)</script>")
-
 
             if not request.POST.get("item_img"):
                 good.update(item_name=item_name, number=int(number), item_price=float(item_price),
@@ -374,8 +442,10 @@ def order(request):
                                      status=0,
                                      item_id=item_id[i], address=Address.objects.filter(id=address[i]).first().content)
                 money = customer.money
-                customer.money = money - int(number[i]) * item.item_price
+                item.number -= int(number[i])
+                customer.money -= int(number[i]) * item.item_price
                 customer.save()
+                item.save()
             Cart.objects.filter(item_id__in=item_id).update(status=1)
             return HttpResponse("<script>alert('下单成功');window.location.href='/index/';</script>")
 
@@ -520,11 +590,15 @@ def reject_order(request):
     if request.method == "POST" and request.session.get("is_login") == 2:
         item_id = int(request.POST.get("id"))
         order = Order.objects.filter(id=item_id)
+        item = Goods.objects.filter(id=order.first().item_id)
         order.update(status=2)
         customer = Customer.objects.filter(id=order.first().buyer_id)
         money = customer.first().money
         money += order.first().sum_price
+        number = item.first().number
+        number += order.first().number
         customer.update(money=money)
+        item.update(number=number)
         return HttpResponse("<script>alert('操作成功');window.location.href='/deal_order/';</script>")
     else:
         raise Http404()
@@ -587,3 +661,14 @@ def search(request):
         return render(request, "search.html", data)
     else:
         raise Http404()
+
+
+def delete_good(request):
+    if request.method == "POST" and request.session.get("is_login") == 2:
+        item_id = request.POST.get("id")
+        if not Goods.objects.filter(id=item_id):
+            return HttpResponse("<script>alert('该商品不存在！');window.history.back(-1);</script>")
+        good = Goods.objects.filter(id=item_id).first()
+        os.remove(MEDIA_ROOT + '/' + str(good.item_img))
+        good.delete()
+        return HttpResponse("<script>alert('删除成功');window.location.href='/deal_good/';</script>")

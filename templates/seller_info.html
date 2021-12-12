@@ -5,13 +5,25 @@
     <title>商户信息页</title>
 </head>
 <body>
+<input type="button" value="返回首页" onclick="window.location.href='/index/'"></button>
 <h1>商户信息</h1>
 <div>
+    <form method="POST" action="{% url 'app1:seller_info' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name='id' value={{ form.id }}>
     <img src="{{ MEDIA_URL }}{{ form.avatar }}" height="200" width="200"><br>
-    用户名:{{ form.name}}<br>
-    邮箱:{{ form.email }}<br>
-    性别:{{ form.get_sex_display }}<br>
-    注册时间:{{ form.register_time }}<br>
+    上传头像：<input type="file" name="avatar" value=“上传” id="item_img" accept="image/jpeg, image/jpg ,image/png"/><br>
+    用户名:<input type="text" name="name" value={{ form.name}}><br>
+    邮箱:<input type="text" name="email" value={{ form.email }}><br>
+    性别：<select name="sex">
+        <option value=0 {% if form.sex == 0%} selected="selected" {% endif %}>男</option>
+        <option value=1 {% if form.sex == 1%} selected="selected" {% endif %}>女</option>
+        <option value=2 {% if form.sex == 2%} selected="selected" {% endif %}>其他</option>
+    </select><br>
+        注册时间:{{ form.register_time }}<br>
+        <button type="submit">修改信息</button>
+        </form>
+
 </div>
 </body>
 </html>

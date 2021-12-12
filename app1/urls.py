@@ -30,6 +30,7 @@ urlpatterns = [
         path('deal_comment/',views.deal_comment,name="deal_comment"),
         path('deal_good/',views.deal_good,name="deal_good"),
         path('search/',views.search,name="search"),
+        path('delete_good/',views.delete_good,name="delete_good"),
 
 
 

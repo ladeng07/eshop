@@ -35,11 +35,13 @@
              <p>@{{ i.seller.name}}</p>
              <h3>价格：{{ i.item_price }}元</h3>
          <a href="/good_info/{{ i.id }}/" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;查看详情</a>
+        <input type="button" value="删除商品" type="submit" onclick="form.action='{% url "app1:delete_good" %}';form.submit();"/>
          {% if i.status %}
              <input type="button" value="下架商品" type="submit" onclick="form.action='{% url "app1:deal_good" %}';form.submit();"/>
         {% else %}
              <input type="button" value="修改商品" type="submit" onclick="form.action='{% url "app1:create_good" %}';form.submit();"/>
              <input type="button" value="上架商品" type="submit" onclick="form.action='{% url "app1:deal_good" %}';form.submit();"/>
+
         {% endif %}
         </div>
     </form>

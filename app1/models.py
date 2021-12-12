@@ -12,7 +12,7 @@ class Customer(models.Model):
     email = models.EmailField(max_length=50, verbose_name="邮箱", unique=True)
     money = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="余额", default=0)
     sex = models.IntegerField(choices=SEX_LIST, verbose_name="性别", null=True, blank=True)
-    avatar = models.ImageField(upload_to="user_avatar/", verbose_name="头像", default="user_avatar/default.jpg")
+    avatar = models.ImageField(upload_to="user_avatar/", verbose_name="头像", default="customer_avatar/default.jpg")
     register_time = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
     goods = models.ManyToManyField(to="Goods", through="Order")
     status = models.BooleanField(default=True, verbose_name="账户状态")
@@ -20,7 +20,7 @@ class Customer(models.Model):
 
 class Cart(models.Model):
     status_choice = ((0, "未下单"), (1, "已下单"))
-    item = models.ForeignKey("Goods",on_delete=models.CASCADE,verbose_name="商品ID")
+    item = models.ForeignKey("Goods", on_delete=models.CASCADE, verbose_name="商品ID")
     seller_id = models.IntegerField(verbose_name="卖家ID")
     buyer_id = models.IntegerField(verbose_name="买家ID")
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="添加时间")
@@ -67,13 +67,14 @@ class Comment(models.Model):
 
 
 class Seller(models.Model):
+    SEX_LIST = ((0, "男"), (1, "女"), (2, "其他"),)
     name = models.CharField(max_length=10, verbose_name="卖家昵称")
     password = models.CharField(max_length=28, verbose_name="密码")
     email = models.EmailField(max_length=50, verbose_name="邮箱", unique=True)
     register_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name="注册时间")
     avatar = models.ImageField(upload_to="seller_avatar/", verbose_name="头像", default="seller_avatar/default.jpg")
-    sex = models.CharField(max_length=10, verbose_name="性别", default=0)
-    status = models.BooleanField(default=True,verbose_name="账户状态")
+    sex = models.IntegerField(choices=SEX_LIST,verbose_name="性别", default=0)
+    status = models.BooleanField(default=True, verbose_name="账户状态")
 
 
 class ReComment(models.Model):
