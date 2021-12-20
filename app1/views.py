@@ -65,8 +65,8 @@ def buyer_register(request):
             if Customer.objects.filter(email=email):
                 return HttpResponse("该邮箱已被注册")
             if cache.has_key(email):
-                return HttpResponse("验证码已发送，请5分钟后重试")
-            verify_code = str(random.randint(1000, 10000))
+                return HttpResponse("验证码已发送，请2分钟后重试")
+            verify_code = str(random.randint(1000, 120))
             cache.set(email, verify_code, 180)
             send_email(request.POST.get("email"), verify_code)
             return HttpResponse("验证码发送成功！")
@@ -235,7 +235,7 @@ def customer_info(request):
         avatar = request.FILES.get("avatar", None)
         if not 3 < len(name) < 12:
             return HttpResponse("<script>alert('请输入正确的用户名！');window.history.back(-1);</script>")
-        if not email or Customer.objects.filter(email=email).first().id != request.session.get("id"):
+        if not email or (Customer.objects.filter(email=email) and Customer.objects.filter(email=email).first().id != request.session.get("id")):
             return HttpResponse("<script>alert('请输入正确的邮箱！');window.history.back(-1);</script>")
         if not sex or sex not in ['1', '2', '0']:
             return HttpResponse("<script>alert('请输入选择正确的性别！');window.history.back(-1);</script>")
@@ -270,7 +270,7 @@ def seller_info(request):
         avatar = request.FILES.get("avatar", None)
         if not 3 < len(name) < 12:
             return HttpResponse("<script>alert('请输入正确的用户名！');window.history.back(-1);</script>")
-        if not email or Seller.objects.filter(email=email).first().id != request.session.get("id"):
+        if not email or (Seller.objects.filter(email=email) and Seller.objects.filter(email=email).first().id != request.session.get("id")):
             return HttpResponse("<script>alert('请输入正确的邮箱！');window.history.back(-1);</script>")
         if not sex or sex not in ['1', '2', '0']:
             return HttpResponse("<script>alert('请输入选择正确的性别！');window.history.back(-1);</script>")
@@ -432,6 +432,8 @@ def order(request):
         item = Goods.objects.filter(id=item_id).first()
         address = request.POST.getlist("address")
         if request.POST.get("status") == "0":
+            if not Customer.objects.filter(id=request.session.get("id")).first().status:
+                return HttpResponse("<script>alert('账号被冻结无法下单！');window.history.back(-1);</script>")
             if not address:
                 return HttpResponse("<script>alert('请选择收货地址！');window.history.back(-1);</script>")
             number = request.POST.getlist("number")
@@ -574,6 +576,8 @@ def deal_order(request):
         data = {"order_list1": order_list1, "order_list2": order_list2, "order_list3": order_list3}
         return render(request, "deal_order.html", data)
     elif request.method == "POST" and request.session.get("is_login") == 2:
+        if not Seller.objects.filter(id=request.session.get("id")).first().status:
+            return HttpResponse("<script>alert('账号被冻结，无法处理订单！');window.history.back(-1);</script>")
         order_id = int(request.POST.get("id"))
         order = Order.objects.filter(id=order_id).first()
         good = Goods.objects.filter(id=order.item_id).first()
@@ -588,6 +592,8 @@ def deal_order(request):
 
 def reject_order(request):
     if request.method == "POST" and request.session.get("is_login") == 2:
+        if not Seller.objects.filter(id=request.session.get("id")).first().status:
+            return HttpResponse("<script>alert('账号被冻结,无法处理订单');window.history.back(-1);</script>")
         item_id = int(request.POST.get("id"))
         order = Order.objects.filter(id=item_id)
         item = Goods.objects.filter(id=order.first().item_id)
@@ -645,6 +651,8 @@ def deal_good(request):
         item_id = int(request.POST.get("id"))
         good = Goods.objects.filter(id=item_id)
         status = good.first().status
+        if not Seller.objects.filter(id=request.session.get("id")).first().status and not status:
+            return HttpResponse("<script>alert('账号被冻结，无法上架商品');window.history.back(-1);</script>")
         good.update(status=bool(1 - status))
         return HttpResponse("<script>alert('操作成功！');window.location.href='/deal_good/';</script>")
     else:

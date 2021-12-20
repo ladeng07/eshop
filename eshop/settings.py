@@ -83,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'eshop',
         'USER': 'root',
-        'PASSWORD': 'HNXhnx123',
+        'PASSWORD': '',
     }
 }
 
@@ -163,6 +163,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
-EMAIL_HOST_USER = 'la_deng07@163.com'
-EMAIL_HOST_PASSWORD = 'UBDBRVCQLLJETLBV'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 EMAIL_FROM = '帅哥刘召发的<la_deng07@163.com>'

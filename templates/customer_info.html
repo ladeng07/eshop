@@ -37,7 +37,7 @@
      注册时间:{{ form.register_time }}<br>
     <form method="POST" action="{% url 'app1:address' %}">
      {% csrf_token %}
-    收获地址:<input type="text" name="address" value="{{ address.content }}">
+    收货地址:<input type="text" name="address" value="{{ address.content }}">
         {% if address %}
             <input type="hidden" name="address_id" value={{ address.id }}>
             <button type="submit">确认修改</button>
